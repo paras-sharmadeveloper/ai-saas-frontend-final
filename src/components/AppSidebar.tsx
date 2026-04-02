@@ -62,7 +62,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           <Headphones className="w-4 h-4 text-sidebar-primary-foreground" />
         </div>
         {!collapsed && (
-          <span className="font-bold text-[15px] text-sidebar-primary-foreground tracking-tight">
+          <span className="font-bold text-[15px] text-foreground tracking-tight">
             Vernal
           </span>
         )}
