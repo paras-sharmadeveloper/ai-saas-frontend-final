@@ -5,20 +5,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Phone, User, Mail, Lock, Loader2, Eye, EyeOff, PhoneCall, MessageSquareText, MailCheck, Shield } from "lucide-react";
 import { toast } from "sonner";
-
+import Axios from "@/utils/Axios";
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      const res = await Axios.post("/register", form);
+
       toast.success("Account created successfully");
-      navigate("/");
-    }, 1300);
+
+      // optional: auto login
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/login");
+
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Registration failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const steps = [
@@ -100,7 +117,7 @@ export default function Signup() {
 
             <Button variant="outline" className="w-full h-12 rounded-xl" type="button">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
               </svg>
               Continue with Apple
             </Button>
@@ -114,16 +131,27 @@ export default function Signup() {
               <Label className="text-sm font-medium">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Enter your full name" className="pl-10 h-12 rounded-xl" required />
-              </div>
+                <Input
+                  placeholder="Enter your full name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="pl-10 h-12 rounded-xl"
+                  required
+                />              </div>
             </div>
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Enter your email" className="pl-10 h-12 rounded-xl" type="email" required />
-              </div>
+                <Input
+                  placeholder="Enter your email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="pl-10 h-12 rounded-xl"
+                  required
+                />              </div>
             </div>
 
             <div className="space-y-2">
@@ -131,9 +159,10 @@ export default function Signup() {
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Create strong password"
-                  className="pl-10 pr-12 h-12 rounded-xl"
                   type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className="pl-10 pr-12 h-12 rounded-xl"
                   required
                 />
                 <button
