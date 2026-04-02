@@ -41,15 +41,15 @@
 
     --radius: 0.625rem;
 
-    --sidebar-background: 150 25% 12%;
-    --sidebar-foreground: 145 10% 75%;
-    --sidebar-primary: 145 63% 50%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 15% 40%;
+    --sidebar-primary: 145 63% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 145 30% 20%;
-    --sidebar-accent-foreground: 145 60% 80%;
-    --sidebar-border: 150 20% 18%;
+    --sidebar-accent: 145 50% 95%;
+    --sidebar-accent-foreground: 145 63% 30%;
+    --sidebar-border: 40 10% 92%;
     --sidebar-ring: 145 63% 42%;
-    --sidebar-muted: 150 15% 40%;
+    --sidebar-muted: 220 10% 55%;
 
     --auth-panel: 145 40% 96%;
   }
