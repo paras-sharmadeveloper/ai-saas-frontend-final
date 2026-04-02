@@ -38,42 +38,49 @@ export default function AITraining() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">AI Training</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div>
+        <h1 className="text-2xl font-bold">AI Training</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Configure how your AI agent behaves and responds</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Config */}
         <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardHeader><CardTitle>Basic Info</CardTitle></CardHeader>
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">Basic Info</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div><Label>AI Name</Label><Input defaultValue="Vernal Assistant" /></div>
-              <div><Label>Greeting Message</Label><Input defaultValue="Hi there! Welcome to Vernal. How can I help you today?" /></div>
-              <div><Label>Closing Message</Label><Input defaultValue="Thanks for chatting! Have a great day." /></div>
+              <div className="space-y-1.5"><Label>AI Name</Label><Input defaultValue="Vernal Assistant" /></div>
+              <div className="space-y-1.5"><Label>Greeting Message</Label><Input defaultValue="Hi there! Welcome to Vernal. How can I help you today?" /></div>
+              <div className="space-y-1.5"><Label>Closing Message</Label><Input defaultValue="Thanks for chatting! Have a great day." /></div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader><CardTitle>Company Context</CardTitle></CardHeader>
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">Company Context</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div><Label>Company Description</Label><Textarea defaultValue="Vernal is an AI-powered voice agent platform." /></div>
-              <div><Label>Services Offered</Label><Textarea defaultValue="AI voice agents, lead qualification, customer support automation" /></div>
-              <div><Label>Target Audience</Label><Input defaultValue="Small to medium businesses" /></div>
+              <div className="space-y-1.5"><Label>Company Description</Label><Textarea defaultValue="Vernal is an AI-powered voice agent platform." /></div>
+              <div className="space-y-1.5"><Label>Services Offered</Label><Textarea defaultValue="AI voice agents, lead qualification, customer support automation" /></div>
+              <div className="space-y-1.5"><Label>Target Audience</Label><Input defaultValue="Small to medium businesses" /></div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader><CardTitle>AI Behavior</CardTitle></CardHeader>
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">AI Behavior</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div><Label>Tone</Label>
+              <div className="space-y-1.5">
+                <Label>Tone</Label>
                 <Select defaultValue="friendly"><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="friendly">Friendly</SelectItem><SelectItem value="professional">Professional</SelectItem></SelectContent>
                 </Select>
               </div>
-              <div><Label>Goal</Label>
+              <div className="space-y-1.5">
+                <Label>Goal</Label>
                 <Select defaultValue="lead"><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="lead">Lead Qualification</SelectItem><SelectItem value="support">Support</SelectItem><SelectItem value="sales">Sales</SelectItem></SelectContent>
                 </Select>
               </div>
-              <div><Label>Response Style</Label>
+              <div className="space-y-1.5">
+                <Label>Response Style</Label>
                 <Select defaultValue="concise"><SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="concise">Short & Concise</SelectItem><SelectItem value="detailed">Detailed & Thorough</SelectItem></SelectContent>
                 </Select>
@@ -81,9 +88,9 @@ export default function AITraining() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Qualifying Questions</CardTitle>
+              <CardTitle className="text-base">Qualifying Questions</CardTitle>
               <Button size="sm" variant="outline" onClick={() => setQuestions((q) => [...q, ""])}><Plus className="w-3 h-3 mr-1" /> Add</Button>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -96,31 +103,33 @@ export default function AITraining() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>FAQ / Knowledge Base</CardTitle>
+              <CardTitle className="text-base">FAQ / Knowledge Base</CardTitle>
               <Button size="sm" variant="outline" onClick={() => setFaqs((f) => [...f, { q: "", a: "" }])}><Plus className="w-3 h-3 mr-1" /> Add</Button>
             </CardHeader>
             <CardContent className="space-y-3">
               {faqs.map((f, i) => (
                 <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                  <Input placeholder="Question" value={f.q} onChange={(e) => { const nf = [...faqs]; nf[i].q = e.target.value; setFaqs(nf); }} />
-                  <Input placeholder="Answer" value={f.a} onChange={(e) => { const nf = [...faqs]; nf[i].a = e.target.value; setFaqs(nf); }} />
+                  <Input placeholder="Question" value={f.q} onChange={(e) => { const nf = [...faqs]; nf[i] = { ...nf[i], q: e.target.value }; setFaqs(nf); }} />
+                  <Input placeholder="Answer" value={f.a} onChange={(e) => { const nf = [...faqs]; nf[i] = { ...nf[i], a: e.target.value }; setFaqs(nf); }} />
                   <Button size="icon" variant="outline" onClick={() => setFaqs((fs) => fs.filter((_, j) => j !== i))}><Trash2 className="w-3 h-3 text-destructive" /></Button>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader><CardTitle>Advanced</CardTitle></CardHeader>
+          <Card className="shadow-sm">
+            <CardHeader><CardTitle className="text-base">Advanced</CardTitle></CardHeader>
             <CardContent>
-              <Label>Custom AI Instructions</Label>
-              <Textarea className="mt-2 min-h-[100px]" placeholder="Add any custom instructions for your AI agent..." />
+              <div className="space-y-1.5">
+                <Label>Custom AI Instructions</Label>
+                <Textarea className="min-h-[100px]" placeholder="Add any custom instructions for your AI agent..." />
+              </div>
             </CardContent>
           </Card>
 
-          <Button onClick={handleSave} disabled={saving} className="w-full md:w-auto">
+          <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Save Configuration
           </Button>
@@ -128,13 +137,13 @@ export default function AITraining() {
 
         {/* Right: Chat Preview */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-20 h-[600px] flex flex-col">
-            <CardHeader className="border-b"><CardTitle className="text-base">Chat Preview</CardTitle></CardHeader>
+          <Card className="shadow-sm sticky top-20 h-[600px] flex flex-col">
+            <CardHeader className="border-b shrink-0"><CardTitle className="text-base">Chat Preview</CardTitle></CardHeader>
             <CardContent className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
-                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                  <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm ${
+                    m.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                   }`}>
                     {m.text}
                   </div>
@@ -142,13 +151,13 @@ export default function AITraining() {
               ))}
               {typing && (
                 <div className="flex justify-start">
-                  <div className="bg-secondary text-muted-foreground rounded-2xl px-4 py-2 text-sm italic">AI is typing...</div>
+                  <div className="bg-muted text-muted-foreground rounded-2xl px-3.5 py-2 text-sm italic">AI is typing...</div>
                 </div>
               )}
             </CardContent>
-            <div className="border-t p-3 flex gap-2">
-              <Input placeholder="Type a message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage()} />
-              <Button size="icon" onClick={sendMessage}><Send className="w-4 h-4" /></Button>
+            <div className="border-t p-3 flex gap-2 shrink-0">
+              <Input placeholder="Type a message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && sendMessage()} className="h-9" />
+              <Button size="icon" onClick={sendMessage} className="shrink-0 h-9 w-9"><Send className="w-4 h-4" /></Button>
             </div>
           </Card>
         </div>
