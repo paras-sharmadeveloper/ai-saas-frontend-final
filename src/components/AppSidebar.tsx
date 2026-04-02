@@ -10,34 +10,21 @@ import {
   Settings,
   Headphones,
   HelpCircle,
-  Mic,
-  AudioWaveform,
-  Music,
-  Video,
-  Layers,
-  Radio,
 } from "lucide-react";
 
 const mainMenu = [
-  { label: "Home", icon: LayoutDashboard, path: "/" },
-  { label: "Explore Voices", icon: Mic, path: "/ai-agents" },
-  { label: "Text to Speech", icon: AudioWaveform, path: "/ai-training" },
-  { label: "Voice Changer", icon: Music, path: "/calls" },
-  { label: "Sound Effects", icon: Layers, path: "/phone-numbers" },
-  { label: "Image & Video", icon: Video, path: "/customers" },
-  { label: "Voice Isolator", icon: Radio, path: "/voice-isolator" },
-];
-
-const productsMenu = [
-  { label: "Studio", icon: Bot, path: "/studio" },
-  { label: "Dubbing", icon: Brain, path: "/dubbing" },
-  { label: "Music", icon: Music, path: "/music" },
-  { label: "Productions", icon: PhoneCall, path: "/productions" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/" },
+  { label: "Phone Numbers", icon: Phone, path: "/phone-numbers" },
+  { label: "AI Agents", icon: Bot, path: "/ai-agents" },
+  { label: "AI Training", icon: Brain, path: "/ai-training" },
+  { label: "Calls", icon: PhoneCall, path: "/calls" },
+  { label: "Customers", icon: Users, path: "/customers" },
 ];
 
 const otherMenu = [
-  { label: "Help Center", icon: HelpCircle, path: "/help" },
+  { label: "Billing", icon: CreditCard, path: "/billing" },
   { label: "Settings", icon: Settings, path: "/settings" },
+  { label: "Help Center", icon: HelpCircle, path: "/help" },
 ];
 
 interface AppSidebarProps {
@@ -81,28 +68,10 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
         )}
       </div>
 
-      {/* Creative Platform label */}
-      {!collapsed && (
-        <div className="px-4 pt-4 pb-1">
-          <div className="flex items-center gap-2 text-sidebar-primary text-xs font-semibold">
-            <span className="w-2 h-2 rounded-full bg-sidebar-primary" />
-            Creative Platform
-          </div>
-        </div>
-      )}
-
       {/* Navigation */}
       <nav className="flex-1 px-2 py-1 overflow-y-auto">
         {sectionTitle("Main Menu")}
         {mainMenu.map((item) => (
-          <NavLink key={item.path} to={item.path} className={linkClass(item.path)}>
-            <item.icon className="w-[17px] h-[17px] shrink-0" />
-            {!collapsed && <span>{item.label}</span>}
-          </NavLink>
-        ))}
-
-        {sectionTitle("Products")}
-        {productsMenu.map((item) => (
           <NavLink key={item.path} to={item.path} className={linkClass(item.path)}>
             <item.icon className="w-[17px] h-[17px] shrink-0" />
             {!collapsed && <span>{item.label}</span>}
