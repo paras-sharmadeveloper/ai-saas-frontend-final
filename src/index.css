@@ -2,62 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 220 20% 10%;
+    --background: 220 14% 96%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 145 63% 42%;
+    --primary: 245 58% 51%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 145 70% 55%;
 
-    --secondary: 40 15% 95%;
-    --secondary-foreground: 220 20% 10%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 40 12% 93%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 220 12% 93%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 145 50% 95%;
-    --accent-foreground: 145 63% 30%;
+    --accent: 245 40% 96%;
+    --accent-foreground: 245 58% 51%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 145 63% 42%;
+    --success: 152 69% 40%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --border: 40 10% 90%;
-    --input: 40 10% 90%;
-    --ring: 145 63% 42%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 245 58% 51%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;
 
-    /* Sidebar - dark forest green */
-    --sidebar-background: 150 25% 12%;
-    --sidebar-foreground: 145 10% 75%;
-    --sidebar-primary: 145 63% 50%;
+    --sidebar-background: 228 33% 10%;
+    --sidebar-foreground: 220 14% 65%;
+    --sidebar-primary: 245 58% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 145 30% 20%;
-    --sidebar-accent-foreground: 145 60% 80%;
-    --sidebar-border: 150 20% 18%;
-    --sidebar-ring: 145 63% 42%;
-    --sidebar-muted: 150 15% 40%;
+    --sidebar-accent: 228 25% 16%;
+    --sidebar-accent-foreground: 220 30% 90%;
+    --sidebar-border: 228 25% 16%;
+    --sidebar-ring: 245 58% 51%;
+    --sidebar-muted: 220 14% 45%;
 
-    /* Auth pages */
-    --auth-panel: 145 40% 96%;
+    --auth-panel: 245 40% 97%;
   }
 }
 
@@ -65,14 +58,12 @@ All colors MUST be HSL.
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-/* Waveform animation for login */
 @keyframes waveform {
   0%, 100% { transform: scaleY(0.3); }
   50% { transform: scaleY(1); }
