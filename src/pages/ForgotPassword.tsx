@@ -21,44 +21,70 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted p-4">
-      <div className="w-full max-w-[420px]">
-        <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
-            <Headphones className="w-6 h-6 text-primary-foreground" />
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[hsl(var(--auth-panel))] flex-col justify-between p-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+              <Headphones className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg text-foreground">Vernal</span>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Reset password</h1>
-          <p className="text-sm text-muted-foreground">We'll send you a reset link</p>
+          <span className="text-sm text-muted-foreground font-medium">2026</span>
         </div>
 
-        <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+        <div className="flex-1 flex flex-col justify-center max-w-lg">
+          <h2 className="text-3xl font-bold text-foreground leading-tight">
+            Don't Worry, We've Got You Covered
+          </h2>
+          <p className="mt-4 text-muted-foreground leading-relaxed">
+            Reset your password in seconds and get back to creating amazing voice content with Vernal.
+          </p>
+        </div>
+
+        <div />
+      </div>
+
+      {/* Right panel */}
+      <div className="flex-1 flex items-center justify-center p-6 bg-background">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground">Reset password</h1>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We'll send you a link to reset your password
+            </p>
+          </div>
+
           {sent ? (
-            <div className="text-center space-y-3 py-6">
-              <CheckCircle className="w-12 h-12 text-success mx-auto" />
-              <p className="font-semibold text-foreground">Check your email</p>
-              <p className="text-sm text-muted-foreground">We've sent a password reset link to your email address.</p>
+            <div className="text-center space-y-4 py-8">
+              <CheckCircle className="w-14 h-14 text-primary mx-auto" />
+              <h3 className="font-semibold text-lg text-foreground">Check your email</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                We've sent a password reset link to your email address. Click the link to set a new password.
+              </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
                 <Label className="text-sm font-medium">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input placeholder="you@example.com" className="pl-9 h-11 rounded-lg" type="email" required />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input placeholder="Enter your email" className="pl-10 h-12 rounded-xl" type="email" required />
                 </div>
               </div>
-              <Button type="submit" className="w-full h-11 rounded-lg text-sm font-semibold" disabled={loading}>
+              <Button type="submit" className="w-full h-12 rounded-xl text-base font-semibold" disabled={loading}>
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Send Reset Link
               </Button>
             </form>
           )}
-        </div>
 
-        <div className="text-center mt-5">
-          <Link to="/login" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1.5">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to login
-          </Link>
+          <div className="text-center">
+            <Link to="/login" className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1.5">
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to login
+            </Link>
+          </div>
         </div>
       </div>
     </div>
