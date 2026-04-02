@@ -9,27 +9,27 @@ const plans = [
   {
     name: "Free",
     price: "$0",
-    desc: "For individuals getting started",
-    features: ["100 calls/month", "1 AI Agent", "Basic analytics", "Email support"],
+    desc: "Get started with basics",
+    features: ["1 AI Agent", "100 calls/month", "1 phone number", "Email support"],
     current: false,
-    action: "Downgrade",
+    action: "Upgrade",
   },
   {
     name: "Pro",
     price: "$49",
     desc: "For growing businesses",
-    features: ["2,000 calls/month", "5 AI Agents", "Advanced analytics", "Priority support", "Custom training"],
+    features: ["5 AI Agents", "2,000 calls/month", "5 phone numbers", "Priority support", "Advanced analytics"],
     current: true,
     action: "Current Plan",
     popular: true,
   },
   {
     name: "Enterprise",
-    price: "$149",
-    desc: "For large organizations",
-    features: ["Unlimited calls", "Unlimited AI Agents", "Custom integrations", "Dedicated support", "SLA guarantee", "API access"],
+    price: "$199",
+    desc: "For large teams",
+    features: ["Unlimited Agents", "Unlimited calls", "Unlimited numbers", "24/7 support", "Custom integrations", "Dedicated CSM"],
     current: false,
-    action: "Contact Sales",
+    action: "Upgrade",
   },
 ];
 
@@ -44,25 +44,9 @@ export default function Billing() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Billing</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your subscription and payment methods</p>
+        <h1 className="text-2xl font-bold text-foreground">Subscription & Billing</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your plan and payment methods</p>
       </div>
-
-      {/* Current Plan Banner */}
-      <Card className="shadow-sm border-primary/20 bg-primary/5">
-        <CardContent className="pt-5 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">Pro Plan</p>
-              <p className="text-sm text-muted-foreground">$49/month · Renews Apr 1, 2026</p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm">Manage Plan</Button>
-        </CardContent>
-      </Card>
 
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -70,7 +54,9 @@ export default function Billing() {
           <Card key={p.name} className={`shadow-sm relative ${p.current ? "border-primary ring-1 ring-primary/20" : ""}`}>
             {p.popular && (
               <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-2.5">Most Popular</Badge>
+                <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-2.5">
+                  <Sparkles className="w-3 h-3 mr-1" /> Most Popular
+                </Badge>
               </div>
             )}
             <CardContent className="pt-6 space-y-4">
@@ -93,7 +79,7 @@ export default function Billing() {
                 className="w-full"
                 variant={p.current ? "outline" : "default"}
                 disabled={p.current}
-                onClick={() => !p.current && toast.success(`${p.action} initiated`)}
+                onClick={() => !p.current && toast.success(`Upgrade initiated`)}
               >
                 {p.action}
               </Button>
@@ -105,7 +91,10 @@ export default function Billing() {
       {/* Payment Method */}
       <Card className="shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Payment Method</CardTitle>
+          <div>
+            <CardTitle className="text-base">Payment Method</CardTitle>
+            <p className="text-sm text-muted-foreground mt-0.5">Your saved payment method</p>
+          </div>
           <Button variant="outline" size="sm" onClick={() => toast.success("Update payment initiated")}>Update</Button>
         </CardHeader>
         <CardContent>
@@ -114,8 +103,8 @@ export default function Billing() {
               <CreditCard className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="font-medium text-sm">Visa ending in 4242</p>
-              <p className="text-xs text-muted-foreground">Expires 12/2025</p>
+              <p className="font-medium text-sm text-foreground">Visa ending in 4242</p>
+              <p className="text-xs text-muted-foreground">Expires 12/2028</p>
             </div>
           </div>
         </CardContent>

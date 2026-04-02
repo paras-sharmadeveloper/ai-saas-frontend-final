@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Bot, HeadphonesIcon, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 
 interface Agent {
@@ -16,14 +14,21 @@ interface Agent {
   goal: string;
   tone: string;
   status: string;
+  calls: number;
   questions: string[];
   faqs: { q: string; a: string }[];
 }
 
+const goalIcon = (goal: string) => {
+  if (goal === "Lead Qualification") return Bot;
+  if (goal === "Customer Support") return HeadphonesIcon;
+  return ShoppingBag;
+};
+
 const initialAgents: Agent[] = [
-  { name: "Lead Qualifier Bot", goal: "Lead Qualification", tone: "Friendly", status: "Active", questions: ["What is your budget?"], faqs: [{ q: "Hours?", a: "24/7" }] },
-  { name: "Customer Support Agent", goal: "Customer Support", tone: "Professional", status: "Active", questions: ["What issue are you facing?"], faqs: [{ q: "Refund policy?", a: "30-day refund." }] },
-  { name: "Sales Assistant", goal: "Lead Qualification", tone: "Friendly", status: "Inactive", questions: [], faqs: [] },
+  { name: "Sales Bot", goal: "Lead Qualification", tone: "Friendly", status: "Active", calls: 342, questions: ["What is your budget?"], faqs: [{ q: "Hours?", a: "24/7" }] },
+  { name: "Support Agent", goal: "Customer Support", tone: "Professional", status: "Active", calls: 189, questions: ["What issue are you facing?"], faqs: [{ q: "Refund policy?", a: "30-day refund." }] },
+  { name: "Booking Assistant", goal: "Sales", tone: "Friendly", status: "Draft", calls: 0, questions: [], faqs: [] },
 ];
 
 export default function AIAgents() {
@@ -43,6 +48,7 @@ export default function AIAgents() {
         goal: fd.get("goal") as string || "Lead Qualification",
         tone: fd.get("tone") as string || "Friendly",
         status: "Active",
+        calls: 0,
         questions: questions.filter(Boolean),
         faqs: faqs.filter((f) => f.q && f.a),
       }]);
@@ -59,16 +65,22 @@ export default function AIAgents() {
     toast.success("Agent deleted");
   };
 
+  const goalLabel = (goal: string) => {
+    if (goal === "Lead Qualification") return "Lead";
+    if (goal === "Customer Support") return "Support";
+    return "Sales";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">AI Agents</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{agents.length} agents configured</p>
+          <h1 className="text-2xl font-bold text-foreground">AI Agents</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Configure your AI voice agents</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-1.5" /> Add Agent</Button>
+            <Button><Plus className="w-4 h-4 mr-1.5" /> New Agent</Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Create New Agent</DialogTitle></DialogHeader>
@@ -85,6 +97,7 @@ export default function AIAgents() {
                     <SelectContent>
                       <SelectItem value="Lead Qualification">Lead Qualification</SelectItem>
                       <SelectItem value="Customer Support">Customer Support</SelectItem>
+                      <SelectItem value="Sales">Sales</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -154,41 +167,45 @@ export default function AIAgents() {
         </Dialog>
       </div>
 
-      <Card className="shadow-sm">
-        <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Agent Name</TableHead>
-                <TableHead>Goal</TableHead>
-                <TableHead>Tone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {agents.map((a, i) => (
-                <TableRow key={i} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">{a.name}</TableCell>
-                  <TableCell><Badge variant="secondary">{a.goal}</Badge></TableCell>
-                  <TableCell className="text-muted-foreground">{a.tone}</TableCell>
-                  <TableCell>
-                    <Badge className={a.status === "Active" ? "bg-success/10 text-success border-0" : "bg-muted text-muted-foreground border-0"}>
-                      {a.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1.5">
-                      <Button size="sm" variant="outline"><Pencil className="w-3 h-3" /></Button>
-                      <Button size="sm" variant="outline" onClick={() => handleDelete(i)}><Trash2 className="w-3 h-3 text-destructive" /></Button>
+      {/* Agent Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {agents.map((a, i) => {
+          const Icon = goalIcon(a.goal);
+          return (
+            <Card key={i} className="shadow-sm">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                    <div>
+                      <h3 className="font-semibold text-foreground text-sm">{a.name}</h3>
+                      <p className="text-xs text-muted-foreground">{goalLabel(a.goal)} · {a.tone}</p>
+                    </div>
+                  </div>
+                  <Badge className={
+                    a.status === "Active"
+                      ? "bg-success/10 text-success border-0"
+                      : "bg-muted text-muted-foreground border-0"
+                  }>
+                    {a.status}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">{a.calls} calls handled</p>
+                <div className="flex items-center justify-end gap-1.5 border-t border-border pt-3">
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
+                    <Pencil className="w-4 h-4 text-muted-foreground" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleDelete(i)}>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
