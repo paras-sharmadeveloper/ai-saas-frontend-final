@@ -91,14 +91,14 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       {!collapsed && (
         <div className="px-3 py-3 border-t border-sidebar-border">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-sidebar-accent-foreground text-xs font-bold shrink-0">
+            <div className="w-8 h-8 rounded-full bg-warning text-warning-foreground flex items-center justify-center text-xs font-bold shrink-0">
               AH
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-sidebar-primary-foreground truncate">
-                Anwar Hussen
+              <p className="text-[13px] font-medium text-foreground truncate">
+                Anwar
               </p>
-              <p className="text-[11px] text-[hsl(var(--sidebar-muted))] truncate">
+              <p className="text-[11px] text-muted-foreground truncate">
                 anwarhussen38@gm...
               </p>
             </div>
