@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 
-const initialMessages = [
-  { role: "ai" as const, text: "Hi there! Welcome to Vernal. How can I help you today?" },
+const initialMessages: { role: "ai" | "user"; text: string }[] = [
+  { role: "ai", text: "Hi there! Welcome to Vernal. How can I help you today?" },
 ];
 
 export default function AITraining() {
