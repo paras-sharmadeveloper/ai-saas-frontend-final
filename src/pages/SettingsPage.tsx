@@ -5,13 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Upload, Eye, EyeOff, Copy, RefreshCw } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
 
   const handleSave = () => {
     setSaving(true);
@@ -73,30 +72,6 @@ export default function SettingsPage() {
               Update Password
             </Button>
           </form>
-        </CardContent>
-      </Card>
-
-      {/* API Keys */}
-      <Card className="shadow-sm">
-        <CardHeader><CardTitle className="text-base">API Keys</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Input
-              value={showApiKey ? "sk_live_vernal_abc123xyz789def456" : "sk_live_••••••••••••••••••••"}
-              readOnly
-              className="font-mono text-sm"
-            />
-            <Button variant="outline" size="icon" onClick={() => setShowApiKey(!showApiKey)}>
-              {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </Button>
-            <Button variant="outline" size="icon" onClick={() => { navigator.clipboard.writeText("sk_live_vernal_abc123xyz789def456"); toast.success("Copied!"); }}>
-              <Copy className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="icon" onClick={() => toast.success("API key regenerated")}>
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">Use this key to authenticate API requests. Keep it secret.</p>
         </CardContent>
       </Card>
     </div>
