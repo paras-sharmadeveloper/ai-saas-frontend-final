@@ -21,13 +21,13 @@ const recentCalls = [
 const statusColor = (s: string) => {
   if (s === "Completed") return "bg-success/10 text-success border-0";
   if (s === "Missed") return "bg-destructive/10 text-destructive border-0";
-  return "bg-accent text-accent-foreground border-0";
+  return "bg-muted text-muted-foreground border-0";
 };
 
 const typeColor = (t: string) => {
   if (t === "Lead") return "bg-primary/10 text-primary border-0";
   if (t === "Support") return "bg-accent text-accent-foreground border-0";
-  if (t === "Sales") return "bg-success/10 text-success border-0";
+  if (t === "Sales") return "bg-primary/10 text-primary border-0";
   return "bg-warning/10 text-warning border-0";
 };
 
@@ -41,12 +41,12 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <Card key={s.label} className="shadow-sm">
+          <Card key={s.label}>
             <CardContent className="pt-5 pb-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground font-medium">{s.label}</p>
-                  <p className="text-2xl font-bold mt-1 text-foreground">{s.value}</p>
+                  <p className="text-sm text-muted-foreground">{s.label}</p>
+                  <p className="text-2xl font-bold mt-1">{s.value}</p>
                 </div>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   s.positive ? "bg-success/10" : "bg-destructive/10"
@@ -63,7 +63,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <Card className="shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle className="text-base">Recent Calls</CardTitle>
         </CardHeader>
@@ -81,7 +81,7 @@ export default function Dashboard() {
             </TableHeader>
             <TableBody>
               {recentCalls.map((c, i) => (
-                <TableRow key={i} className="hover:bg-muted/50">
+                <TableRow key={i}>
                   <TableCell className="font-medium">{c.customer}</TableCell>
                   <TableCell className="text-muted-foreground">{c.phone}</TableCell>
                   <TableCell><Badge className={typeColor(c.type)}>{c.type}</Badge></TableCell>
