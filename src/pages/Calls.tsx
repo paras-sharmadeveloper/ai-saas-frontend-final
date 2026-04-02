@@ -20,7 +20,7 @@ const filters = ["All", "Lead", "Support", "Complaint"];
 const statusColor = (s: string) => {
   if (s === "Completed") return "bg-success/10 text-success border-0";
   if (s === "Missed") return "bg-destructive/10 text-destructive border-0";
-  return "bg-muted text-muted-foreground border-0";
+  return "bg-accent text-accent-foreground border-0";
 };
 
 export default function Calls() {
@@ -37,16 +37,16 @@ export default function Calls() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Calls</h1>
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         {filters.map((f) => (
-          <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)}>{f}</Button>
+          <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="rounded-lg">{f}</Button>
         ))}
         <div className="relative ml-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search customer..." className="pl-9 w-56" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input placeholder="Search customer..." className="pl-9 w-56 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
-      <Card>
+      <Card className="shadow-sm">
         <CardContent className="pt-6">
           <Table>
             <TableHeader>
@@ -61,7 +61,7 @@ export default function Calls() {
             </TableHeader>
             <TableBody>
               {filtered.map((c) => (
-                <TableRow key={c.id} className="cursor-pointer hover:bg-secondary/50" onClick={() => navigate(`/calls/${c.id}`)}>
+                <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/calls/${c.id}`)}>
                   <TableCell className="font-medium">{c.customer}</TableCell>
                   <TableCell className="text-muted-foreground">{c.phone}</TableCell>
                   <TableCell><Badge variant="secondary">{c.type}</Badge></TableCell>

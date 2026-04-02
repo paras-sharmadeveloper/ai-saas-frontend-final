@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Users, PhoneMissed, Clock } from "lucide-react";
+import { Phone, Users, PhoneMissed, Clock, TrendingUp, TrendingDown } from "lucide-react";
 
 const stats = [
   { label: "Total Calls", value: "2,847", change: "+12.5%", positive: true, icon: Phone },
@@ -21,14 +21,14 @@ const recentCalls = [
 const statusColor = (s: string) => {
   if (s === "Completed") return "bg-success/10 text-success border-0";
   if (s === "Missed") return "bg-destructive/10 text-destructive border-0";
-  return "bg-muted text-muted-foreground border-0";
+  return "bg-accent text-accent-foreground border-0";
 };
 
 const typeColor = (t: string) => {
   if (t === "Lead") return "bg-primary/10 text-primary border-0";
-  if (t === "Support") return "bg-blue-100 text-blue-700 border-0";
-  if (t === "Sales") return "bg-primary/10 text-primary border-0";
-  return "bg-orange-100 text-orange-700 border-0";
+  if (t === "Support") return "bg-accent text-accent-foreground border-0";
+  if (t === "Sales") return "bg-success/10 text-success border-0";
+  return "bg-warning/10 text-warning border-0";
 };
 
 export default function Dashboard() {
@@ -36,31 +36,36 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your AI voice agent platform</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Overview of your AI voice agent platform</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <Card key={s.label}>
-            <CardContent className="pt-6">
+          <Card key={s.label} className="shadow-sm">
+            <CardContent className="pt-5 pb-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                  <p className="text-3xl font-bold mt-1">{s.value}</p>
-                  <p className={`text-sm mt-1 ${s.positive ? "text-success" : "text-destructive"}`}>
-                    {s.change} vs last month
-                  </p>
+                  <p className="text-sm text-muted-foreground font-medium">{s.label}</p>
+                  <p className="text-2xl font-bold mt-1 text-foreground">{s.value}</p>
                 </div>
-                <s.icon className={`w-6 h-6 ${s.positive ? "text-success" : "text-destructive"}`} />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  s.positive ? "bg-success/10" : "bg-destructive/10"
+                }`}>
+                  <s.icon className={`w-5 h-5 ${s.positive ? "text-success" : "text-destructive"}`} />
+                </div>
+              </div>
+              <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${s.positive ? "text-success" : "text-destructive"}`}>
+                {s.positive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+                {s.change} vs last month
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Recent Calls</CardTitle>
+          <CardTitle className="text-base">Recent Calls</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -76,7 +81,7 @@ export default function Dashboard() {
             </TableHeader>
             <TableBody>
               {recentCalls.map((c, i) => (
-                <TableRow key={i}>
+                <TableRow key={i} className="hover:bg-muted/50">
                   <TableCell className="font-medium">{c.customer}</TableCell>
                   <TableCell className="text-muted-foreground">{c.phone}</TableCell>
                   <TableCell><Badge className={typeColor(c.type)}>{c.type}</Badge></TableCell>
