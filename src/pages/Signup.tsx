@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Headphones, User, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Phone, User, Mail, Lock, Loader2, Eye, EyeOff, PhoneCall, MessageSquareText, MailCheck, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Signup() {
@@ -21,6 +21,13 @@ export default function Signup() {
     }, 1300);
   };
 
+  const steps = [
+    { icon: PhoneCall, title: "AI Picks Up", desc: "Your agent answers every call instantly, 24/7" },
+    { icon: MessageSquareText, title: "Smart Conversation", desc: "Handles queries with natural, human-like responses" },
+    { icon: MailCheck, title: "Email Delivery", desc: "Transcript & recording sent to your inbox automatically" },
+    { icon: Shield, title: "Never Miss A Lead", desc: "Every caller gets a professional response, always" },
+  ];
+
   return (
     <div className="min-h-screen flex">
       {/* Left panel */}
@@ -28,38 +35,39 @@ export default function Signup() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Headphones className="w-5 h-5 text-primary-foreground" />
+              <Phone className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-foreground">Vernal</span>
           </div>
-          <span className="text-sm text-muted-foreground font-medium">2026</span>
+          <span className="text-sm text-muted-foreground font-medium">AI Agent</span>
         </div>
 
         <div className="flex-1 flex flex-col justify-center max-w-lg">
           <h2 className="text-3xl font-bold text-foreground leading-tight">
-            Make Your Words Sound As Strong As They Read
+            AI-Powered Call Agent For Your Business
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Vernal transforms written communication with advanced text-to-speech that delivers clarity, emotion, and professional-grade sound output.
+            Set up your AI agent in minutes. It answers calls, talks to your customers, and emails you the full transcript & recording instantly.
           </p>
 
-          {/* Mini dashboard preview */}
-          <div className="mt-8 bg-card rounded-2xl p-4 shadow-sm border border-border overflow-hidden">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
-                <Headphones className="w-3 h-3 text-primary-foreground" />
-              </div>
-              <span className="text-xs font-semibold text-foreground">Vernal</span>
-              <span className="text-[10px] text-muted-foreground ml-auto">Good morning, Tahsan 🌟</span>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {["Instant Speech", "Audio Book", "Video Play", "AI Agent"].map((label) => (
-                <div key={label} className="bg-accent rounded-lg p-2 text-center">
-                  <div className="w-8 h-8 rounded-md bg-primary/10 mx-auto mb-1" />
-                  <p className="text-[9px] font-medium text-foreground truncate">{label}</p>
+          {/* How it works */}
+          <div className="mt-8 space-y-3">
+            {steps.map(({ icon: Icon, title, desc }, i) => (
+              <div
+                key={title}
+                className="flex items-start gap-4 bg-card rounded-xl p-4 border border-border shadow-sm"
+                style={{ animation: `fade-in 0.4s ease-out ${i * 0.15}s both` }}
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
-              ))}
-            </div>
+                <div>
+                  <p className="font-semibold text-sm text-foreground">{title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                </div>
+                <span className="ml-auto text-xs font-bold text-primary/40 shrink-0">0{i + 1}</span>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -3,27 +3,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Headphones, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Phone, Mail, Lock, Loader2, Eye, EyeOff, Bot, PhoneIncoming, FileText, Send } from "lucide-react";
 import { toast } from "sonner";
 
-function WaveformVisual() {
-  const bars = Array.from({ length: 60 }, (_, i) => {
-    const height = Math.sin(i * 0.3) * 40 + Math.random() * 30 + 20;
-    const delay = i * 0.05;
+function CallWaveVisual() {
+  const bars = Array.from({ length: 50 }, (_, i) => {
+    const height = Math.sin(i * 0.25) * 35 + Math.random() * 25 + 20;
+    const delay = i * 0.06;
     return (
       <div
         key={i}
         className="w-[3px] rounded-full bg-primary/60"
         style={{
           height: `${height}%`,
-          animation: `waveform ${1.5 + Math.random()}s ease-in-out ${delay}s infinite`,
+          animation: `waveform ${1.8 + Math.random()}s ease-in-out ${delay}s infinite`,
         }}
       />
     );
   });
 
   return (
-    <div className="flex items-center justify-center gap-[2px] h-32 px-6">
+    <div className="flex items-center justify-center gap-[2px] h-20 px-4">
       {bars}
     </div>
   );
@@ -51,32 +51,50 @@ export default function Login() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Headphones className="w-5 h-5 text-primary-foreground" />
+              <Phone className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-foreground">Vernal</span>
           </div>
-          <span className="text-sm text-muted-foreground font-medium">2026</span>
+          <span className="text-sm text-muted-foreground font-medium">AI Agent</span>
         </div>
 
         <div className="flex-1 flex flex-col justify-center max-w-lg">
           <h2 className="text-3xl font-bold text-foreground leading-tight">
-            Welcome Back To Your Creative Workspace
+            Your AI Agent That Never Misses A Call
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Access your projects, saved voices, and productivity tools in one secure and elegant platform.
+            Vernal's AI agent picks up every call, answers intelligently, and sends you the transcript & recording via email — so you never miss a lead.
           </p>
 
-          <div className="mt-8 bg-card rounded-2xl p-5 shadow-sm border border-border">
-            <div className="flex items-start justify-between mb-3">
+          {/* Live call simulation card */}
+          <div className="mt-8 bg-card rounded-2xl p-5 shadow-sm border border-border space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <PhoneIncoming className="w-5 h-5 text-primary" />
+              </div>
               <div>
-                <p className="font-semibold text-foreground text-sm">Product Design Speech Recording Test</p>
-                <p className="text-xs text-muted-foreground mt-1">12:54 &nbsp; 00:43 Original</p>
+                <p className="font-semibold text-foreground text-sm">Incoming Call — AI Answering</p>
+                <p className="text-xs text-muted-foreground">+1 (555) 842-1923 • 00:47</p>
+              </div>
+              <div className="ml-auto flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-medium text-primary">Live</span>
               </div>
             </div>
-            <WaveformVisual />
-            <div className="flex justify-between text-[10px] text-muted-foreground mt-2 px-1">
-              {["00:00", "00:01", "00:02", "00:03", "00:04", "00:05", "00:06", "00:07"].map((t) => (
-                <span key={t}>{t}</span>
+
+            <CallWaveVisual />
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { icon: Bot, label: "AI Answers", desc: "24/7 availability" },
+                { icon: FileText, label: "Transcript", desc: "Auto-generated" },
+                { icon: Send, label: "Email", desc: "Instant delivery" },
+              ].map(({ icon: Icon, label, desc }) => (
+                <div key={label} className="bg-accent rounded-xl p-3 text-center">
+                  <Icon className="w-5 h-5 text-accent-foreground mx-auto mb-1.5" />
+                  <p className="text-[11px] font-semibold text-foreground">{label}</p>
+                  <p className="text-[9px] text-muted-foreground">{desc}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -92,7 +110,7 @@ export default function Login() {
             <h1 className="text-2xl font-bold text-foreground">
               Welcome back
               <br />
-              <span className="text-foreground">to vernal</span>
+              <span className="text-foreground">to Vernal</span>
             </h1>
             <p className="mt-3 text-sm text-muted-foreground">
               Don't have an account?{" "}
@@ -108,7 +126,7 @@ export default function Login() {
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="paras@gmail.com"
+                  placeholder="you@company.com"
                   className="pl-10 h-12 rounded-xl border-border bg-background"
                   type="email"
                   required
