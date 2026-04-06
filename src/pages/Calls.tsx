@@ -1,38 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-
-const allCalls = [
-  { id: "1", customer: "Sarah Johnson", phone: "+1 (555) 123-4567", type: "Lead", status: "Completed", date: "Apr 1, 2026", duration: "5:23" },
-  { id: "2", customer: "Michael Chen", phone: "+1 (555) 234-5678", type: "Support", status: "Completed", date: "Apr 1, 2026", duration: "3:45" },
-  { id: "3", customer: "Emma Wilson", phone: "+1 (555) 345-6789", type: "Lead", status: "Missed", date: "Apr 1, 2026", duration: "—" },
-  { id: "4", customer: "James Brown", phone: "+1 (555) 456-7890", type: "Complaint", status: "In Progress", date: "Mar 31, 2026", duration: "8:12" },
-  { id: "5", customer: "Lisa Davis", phone: "+1 (555) 567-8901", type: "Support", status: "Completed", date: "Mar 31, 2026", duration: "2:10" },
-];
+import { Search, Loader2, PhoneCall } from "lucide-react";
+import { toast } from "sonner";
+import { callsService, type Call } from "@/services/callsService";
 
 const filters = ["All", "Lead", "Support", "Complaint"];
 
 const statusColor = (s: string) => {
-  if (s === "Completed") return "bg-success/10 text-success border-0";
-  if (s === "Missed") return "bg-destructive/10 text-destructive border-0";
+  if (s?.toLowerCase() === "completed") return "bg-success/10 text-success border-0";
+  if (s?.toLowerCase() === "missed") return "bg-destructive/10 text-destructive border-0";
   return "bg-accent text-accent-foreground border-0";
 };
 
+const getCustomerName = (c: Call) =>
+  c.customer?.name ?? "—";
+
+const getCustomerPhone = (c: Call) =>
+  c.customer?.phone ?? c.to ?? "—";
+
+const getType = (c: Call) => c.type ?? "—";
+
 export default function Calls() {
+  const [calls, setCalls] = useState<Call[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const filtered = allCalls.filter((c) => {
-    if (filter !== "All" && c.type !== filter) return false;
-    if (search && !c.customer.toLowerCase().includes(search.toLowerCase())) return false;
+  useEffect(() => {
+    callsService
+      .getAll()
+      .then(setCalls)
+      .catch(() => toast.error("Failed to load calls"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = calls.filter((c) => {
+    const name = getCustomerName(c).toLowerCase();
+    if (filter !== "All" && getType(c) !== filter) return false;
+    if (search && !name.includes(search.toLowerCase())) return false;
     return true;
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -46,32 +67,47 @@ export default function Calls() {
           <Input placeholder="Search customer..." className="pl-9 w-56 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
+
       <Card className="shadow-sm">
         <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Duration</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((c) => (
-                <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/calls/${c.id}`)}>
-                  <TableCell className="font-medium">{c.customer}</TableCell>
-                  <TableCell className="text-muted-foreground">{c.phone}</TableCell>
-                  <TableCell><Badge variant="secondary">{c.type}</Badge></TableCell>
-                  <TableCell><Badge className={statusColor(c.status)}>{c.status}</Badge></TableCell>
-                  <TableCell className="text-muted-foreground">{c.date}</TableCell>
-                  <TableCell>{c.duration}</TableCell>
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <PhoneCall className="w-10 h-10 text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground font-medium">No calls found</p>
+              <p className="text-sm text-muted-foreground/60 mt-1">
+                {search ? "Try a different search term" : "Calls will appear here once they come in"}
+              </p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Duration</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((c) => (
+                  <TableRow
+                    key={c.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => navigate(`/admin/calls/${c.id}`)}
+                  >
+                    <TableCell className="font-medium">{getCustomerName(c)}</TableCell>
+                    <TableCell className="text-muted-foreground">{getCustomerPhone(c)}</TableCell>
+                    <TableCell><Badge variant="secondary">{getType(c)}</Badge></TableCell>
+                    <TableCell><Badge className={statusColor(c.status ?? "")}>{c.status ?? "—"}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground">{c.created_at ?? "—"}</TableCell>
+                    <TableCell>{c.duration ?? "—"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect  } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,8 @@ const initialMessages: { role: "ai" | "user"; text: string }[] = [
   { role: "ai", text: "Hi there! Welcome to Vernal. How can I help you today?" },
 ];
 
+
+
 export default function AITraining() {
   const [saving, setSaving] = useState(false);
   const [questions, setQuestions] = useState(["What is your budget?", "When do you need this?"]);
@@ -19,6 +21,7 @@ export default function AITraining() {
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+
 
   const handleSave = () => {
     setSaving(true);
@@ -59,10 +62,20 @@ export default function AITraining() {
             <CardHeader><CardTitle className="text-base">Company Context</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5"><Label>Company Description</Label><Textarea defaultValue="Vernal is an AI-powered voice agent platform." /></div>
+              <div className="space-y-1.5">
+                    <Label>Company URL</Label>
+                    <Input
+                      type="url"
+                      placeholder="https://yourcompany.com"
+                      defaultValue="https://vernal.com"
+                    />
+                  </div>
               <div className="space-y-1.5"><Label>Services Offered</Label><Textarea defaultValue="AI voice agents, lead qualification, customer support automation" /></div>
               <div className="space-y-1.5"><Label>Target Audience</Label><Input defaultValue="Small to medium businesses" /></div>
+
             </CardContent>
           </Card>
+
 
           <Card className="shadow-sm">
             <CardHeader><CardTitle className="text-base">AI Behavior</CardTitle></CardHeader>
