@@ -15,6 +15,8 @@ import Billing from "../pages/Billing";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
+import LoginSuccess from "../pages/LoginSuccess";
 import NotFound from "../pages/NotFound";
 
 import PrivateRoute from "./PrivateRoute";
@@ -46,6 +48,8 @@ const AppRoutes = () => {
       />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/login-success" element={<LoginSuccess />} />
 
       {/* Private */}
       <Route element={<PrivateRoute />}>

@@ -14,6 +14,8 @@ export const API_ROUTES = {
     resetPassword: "/reset-password",
     socialLogin: "/social-login",
     user: "/user",
+    googleRedirect: "/auth/google",
+    googleCallback: "/auth/google/callback",
   },
 
   // Company
@@ -47,6 +49,19 @@ export const API_ROUTES = {
     message: "/call/message",
     end: "/call/end",
     recording: "/call/recording",
+  },
+
+  // Stripe / Billing
+  stripe: {
+    plans: "/stripe/plans",
+    myPlan: "/stripe/my-plan",
+    subscription: "/stripe/subscription",
+    invoices: "/stripe/invoices",
+    invoiceById: (id: string) => `/stripe/invoices/${id}`,
+    createPaymentIntent: "/stripe/create-payment-intent",
+    confirmPayment: "/stripe/confirm-payment",
+    cancel: "/stripe/cancel",
+    webhook: "/stripe/webhook",
   },
 
   // Settings / Profile

@@ -5,19 +5,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Headphones, Mail, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { authService } from "@/services/authService";
 
 export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await authService.forgotPassword(email);
       setSent(true);
       toast.success("Reset link sent");
-    }, 1200);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "Failed to send reset link";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,7 +79,14 @@ export default function ForgotPassword() {
                 <Label className="text-sm font-medium">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input placeholder="Enter your email" className="pl-10 h-12 rounded-xl" type="email" required />
+                  <Input
+                    placeholder="Enter your email"
+                    className="pl-10 h-12 rounded-xl"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
               </div>
               <Button type="submit" className="w-full h-12 rounded-xl text-base font-semibold" disabled={loading}>
