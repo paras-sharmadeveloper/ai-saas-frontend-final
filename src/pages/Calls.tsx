@@ -9,21 +9,28 @@ import { Search, Loader2, PhoneCall } from "lucide-react";
 import { toast } from "sonner";
 import { callsService, type Call } from "@/services/callsService";
 
-const filters = ["All", "Lead", "Support", "Complaint"];
+const filters = ["All", "lead", "complaint", "service"];
+
+const intentColor = (intent: string) => {
+  const i = intent?.toLowerCase();
+  if (i === "lead") return "bg-green-100 text-green-700 border-0";
+  if (i === "complaint") return "bg-red-100 text-red-700 border-0";
+  return "bg-blue-100 text-blue-700 border-0"; // service / other
+};
 
 const statusColor = (s: string) => {
-  if (s?.toLowerCase() === "completed") return "bg-success/10 text-success border-0";
-  if (s?.toLowerCase() === "missed") return "bg-destructive/10 text-destructive border-0";
+  if (s?.toLowerCase() === "success" || s?.toLowerCase() === "completed") return "bg-success/10 text-success border-0";
+  if (s?.toLowerCase() === "missed" || s?.toLowerCase() === "failed") return "bg-destructive/10 text-destructive border-0";
   return "bg-accent text-accent-foreground border-0";
 };
 
 const getCustomerName = (c: Call) =>
-  c.customer?.name ?? "—";
+  c.customer?.name ?? c.customer_name ?? "—";
 
 const getCustomerPhone = (c: Call) =>
-  c.customer?.phone ?? c.to ?? "—";
+  c.customer?.phone ?? c.phone ?? c.to ?? "—";
 
-const getType = (c: Call) => c.type ?? "—";
+const getType = (c: Call) => c.intent ?? c.call_type ?? c.type ?? "—";
 
 export default function Calls() {
   const [calls, setCalls] = useState<Call[]>([]);
@@ -42,8 +49,8 @@ export default function Calls() {
 
   const filtered = calls.filter((c) => {
     const name = getCustomerName(c).toLowerCase();
-    if (filter !== "All" && getType(c) !== filter) return false;
-    if (search && !name.includes(search.toLowerCase())) return false;
+    if (filter !== "All" && getType(c)?.toLowerCase() !== filter) return false;
+    if (search && !name.includes(search.toLowerCase()) && !(c.phone ?? "").includes(search)) return false;
     return true;
   });
 
@@ -95,13 +102,13 @@ export default function Calls() {
                   <TableRow
                     key={c.id}
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => navigate(`/admin/calls/${c.id}`)}
+                    onClick={() => navigate(`/calls/${c.id}`)}
                   >
                     <TableCell className="font-medium">{getCustomerName(c)}</TableCell>
                     <TableCell className="text-muted-foreground">{getCustomerPhone(c)}</TableCell>
-                    <TableCell><Badge variant="secondary">{getType(c)}</Badge></TableCell>
+                    <TableCell><Badge className={intentColor(getType(c))}>{getType(c)}</Badge></TableCell>
                     <TableCell><Badge className={statusColor(c.status ?? "")}>{c.status ?? "—"}</Badge></TableCell>
-                    <TableCell className="text-muted-foreground">{c.created_at ?? "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{c.date ?? c.created_at ?? "—"}</TableCell>
                     <TableCell>{c.duration ?? "—"}</TableCell>
                   </TableRow>
                 ))}

@@ -53,7 +53,8 @@ const AppRoutes = () => {
 
       {/* Private */}
       <Route element={<PrivateRoute />}>
-        <Route path="/admin" element={<DashboardLayout />}>
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="phone-numbers" element={<PhoneNumbers />} />
           <Route path="ai-agents" element={<AIAgents />} />

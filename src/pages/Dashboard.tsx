@@ -1,6 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Phone, Users, PhoneMissed, Clock, TrendingUp, TrendingDown } from "lucide-react";
 
 const stats = [
@@ -10,33 +8,23 @@ const stats = [
   { label: "Avg Call Duration", value: "4m 32s", change: "+0.8%", positive: true, icon: Clock },
 ];
 
-const recentCalls = [
-  { customer: "Sarah Johnson", phone: "+1 (555) 123-4567", type: "Lead", status: "Completed", duration: "5:23", date: "2 min ago" },
-  { customer: "Michael Chen", phone: "+1 (555) 234-5678", type: "Support", status: "Completed", duration: "3:45", date: "15 min ago" },
-  { customer: "Emma Wilson", phone: "+1 (555) 345-6789", type: "Lead", status: "Missed", duration: "—", date: "1 hr ago" },
-  { customer: "James Brown", phone: "+1 (555) 456-7890", type: "Sales", status: "Completed", duration: "8:12", date: "2 hrs ago" },
-  { customer: "Lisa Davis", phone: "+1 (555) 567-8901", type: "Complaint", status: "In Progress", duration: "2:10", date: "3 hrs ago" },
-];
-
-const statusColor = (s: string) => {
-  if (s === "Completed") return "bg-success/10 text-success border-0";
-  if (s === "Missed") return "bg-destructive/10 text-destructive border-0";
-  return "bg-muted text-muted-foreground border-0";
-};
-
-const typeColor = (t: string) => {
-  if (t === "Lead") return "bg-primary/10 text-primary border-0";
-  if (t === "Support") return "bg-accent text-accent-foreground border-0";
-  if (t === "Sales") return "bg-primary/10 text-primary border-0";
-  return "bg-warning/10 text-warning border-0";
-};
-
 export default function Dashboard() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Overview of your AI voice agent platform</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Overview of your AI voice agent platform</p>
+        </div>
+        <div className="flex items-center gap-2.5 bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl">
+          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+            <Phone className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <p className="text-[11px] text-muted-foreground leading-none">Assigned Number</p>
+            <p className="text-sm font-bold text-primary mt-0.5 tracking-wide">+1 (555) 100-0005</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -62,38 +50,6 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Calls</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentCalls.map((c, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{c.customer}</TableCell>
-                  <TableCell className="text-muted-foreground">{c.phone}</TableCell>
-                  <TableCell><Badge className={typeColor(c.type)}>{c.type}</Badge></TableCell>
-                  <TableCell><Badge className={statusColor(c.status)}>{c.status}</Badge></TableCell>
-                  <TableCell>{c.duration}</TableCell>
-                  <TableCell className="text-muted-foreground">{c.date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   );
 }

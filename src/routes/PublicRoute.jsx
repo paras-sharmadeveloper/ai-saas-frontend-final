@@ -7,7 +7,7 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? (
     children
   ) : (
-    <Navigate to="/admin/dashboard" replace />
+    <Navigate to="/dashboard" replace />
   );
 };
 

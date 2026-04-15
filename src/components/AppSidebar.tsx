@@ -14,18 +14,17 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 
 const mainMenu = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-  { label: "Phone Numbers", icon: Phone, path: "/admin/phone-numbers" },
-  { label: "AI Agents", icon: Bot, path: "/admin/ai-agents" },
-  { label: "AI Training", icon: Brain, path: "/admin/ai-training" },
-  { label: "Calls", icon: PhoneCall, path: "/admin/calls" },
-  { label: "Customers", icon: Users, path: "/admin/customers" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  // { label: "AI Agents", icon: Bot, path: "/ai-agents" },
+  { label: "AI Training", icon: Brain, path: "/ai-training" },
+  { label: "Calls", icon: PhoneCall, path: "/calls" },
+  // { label: "Customers", icon: Users, path: "/customers" },
 ];
 
 const otherMenu = [
-  { label: "Billing", icon: CreditCard, path: "/admin/billing" },
-  { label: "Settings", icon: Settings, path: "/admin/settings" },
-  { label: "Help Center", icon: HelpCircle, path: "/admin/help" },
+  { label: "Billing", icon: CreditCard, path: "/billing" },
+  { label: "Settings", icon: Settings, path: "/settings" },
+  { label: "Help Center", icon: HelpCircle, path: "/help" },
 ];
 
 interface AppSidebarProps {
@@ -48,7 +47,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
         {title}
       </p>
     ) : <div className="mt-4" />;
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => (state.auth as { user: { name?: string; email?: string } | null }).user);
   return (
     <aside
       className={`flex flex-col bg-sidebar h-screen sticky top-0 transition-all duration-200 ${collapsed ? "w-[60px]" : "w-56"

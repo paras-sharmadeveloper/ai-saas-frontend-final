@@ -30,12 +30,11 @@ export default function LoginSuccess() {
       .get("/user", { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => {
         dispatch(loginSuccess({ token, user: res.data }));
-        navigate("/admin/dashboard", { replace: true });
+        navigate("/dashboard", { replace: true });
       })
       .catch(() => {
-        // If user fetch fails, still log in with token only
         dispatch(loginSuccess({ token, user: null }));
-        navigate("/admin/dashboard", { replace: true });
+        navigate("/dashboard", { replace: true });
       });
   }, []);
 
