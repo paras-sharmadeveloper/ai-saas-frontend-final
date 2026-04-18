@@ -17,6 +17,7 @@ import Signup from "../pages/Signup";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import LoginSuccess from "../pages/LoginSuccess";
+import Onboarding from "../pages/Onboarding";
 import NotFound from "../pages/NotFound";
 
 import PrivateRoute from "./PrivateRoute";
@@ -50,6 +51,7 @@ const AppRoutes = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login-success" element={<LoginSuccess />} />
+      <Route path="/onboarding" element={<Onboarding />} />
 
       {/* Private */}
       <Route element={<PrivateRoute />}>

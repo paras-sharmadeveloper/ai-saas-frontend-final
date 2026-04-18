@@ -18,12 +18,24 @@ export const API_ROUTES = {
     googleCallback: "/auth/google/callback",
   },
 
+  // Dashboard
+  dashboard: {
+    base: "/dashboard",
+  },
+
   // Company
   company: {
     base: "/company",
+    onboarding: "/company/onboarding",
   },
 
-  // Agent
+  // Agent / AI Training
+  aiTraining: {
+    base: "/agent",
+    byId: (id: string) => `/agent/${id}`,
+  },
+
+  // Agent (same routes, alias)
   agent: {
     base: "/agent",
     byId: (id: string) => `/agent/${id}`,
