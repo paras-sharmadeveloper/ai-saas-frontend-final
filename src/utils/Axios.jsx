@@ -4,9 +4,7 @@ const isLocal =
   window.location.hostname === "127.0.0.1";
 
 const Axios = axios.create({
-  baseURL: isLocal
-    ? "http://localhost:8000/api"
-    : "https://api.hyperiontech.com.au/api", // Backend API
+  baseURL: import.meta.env.VITE_API_BASE_URL, // Backend API
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
