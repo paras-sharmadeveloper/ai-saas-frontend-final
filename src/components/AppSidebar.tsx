@@ -1,24 +1,35 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Phone,
-  Bot,
   Brain,
   PhoneCall,
   Users,
   CreditCard,
   Settings,
-  Headphones,
   HelpCircle,
 } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 
+function LyraaMark({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <div className={`rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0 ${className}`}>
+      <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
+        <g transform="translate(2, 12)">
+          <rect x="0" y="-2.5" width="2" height="5" rx="1" fill="hsl(var(--sidebar-accent))" opacity="0.85" />
+          <rect x="4" y="-5" width="2" height="10" rx="1" fill="#fff" opacity="0.92" />
+          <rect x="8" y="-7.5" width="2" height="15" rx="1" fill="#fff" />
+          <rect x="12" y="-4" width="2" height="8" rx="1" fill="#fff" opacity="0.92" />
+          <rect x="16" y="-6" width="2" height="12" rx="1" fill="#fff" opacity="0.85" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 const mainMenu = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  // { label: "AI Agents", icon: Bot, path: "/ai-agents" },
   { label: "AI Training", icon: Brain, path: "/ai-training" },
   { label: "Calls", icon: PhoneCall, path: "/calls" },
-  // { label: "Customers", icon: Users, path: "/customers" },
 ];
 
 const otherMenu = [
@@ -55,12 +66,10 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-3 h-14 border-b border-sidebar-border shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center shrink-0">
-          <Headphones className="w-4 h-4 text-sidebar-primary-foreground" />
-        </div>
+        <LyraaMark />
         {!collapsed && (
-          <span className="font-bold text-[15px] text-foreground tracking-tight">
-            Vernal
+          <span className="font-bold text-[16px] text-foreground tracking-tight lowercase">
+            lyraa
           </span>
         )}
       </div>

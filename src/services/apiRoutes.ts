@@ -29,6 +29,32 @@ export const API_ROUTES = {
     onboarding: "/company/onboarding",
   },
 
+  // AI Training supporting APIs
+  tones: {
+    base: "/tones",
+    byId: (id: string) => `/tones/${id}`,
+  },
+  languages: {
+    base: "/languages",
+    byId: (id: string) => `/languages/${id}`,
+  },
+  voiceTypes: {
+    base: "/voice-types",
+    byId: (id: string) => `/voice-types/${id}`,
+  },
+  voices: {
+    base: "/voices",
+    byId: (id: string) => `/voices/${id}`,
+  },
+  services: {
+    base: "/services",
+    byId: (id: string) => `/services/${id}`,
+  },
+  agentCreate: {
+    create: "/agent/create",
+    updatePrompt: (id: string) => `/agent/${id}/prompt`,
+  },
+
   // Agent / AI Training
   aiTraining: {
     base: "/agent",

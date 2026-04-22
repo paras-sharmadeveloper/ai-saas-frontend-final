@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Headphones, Mail, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { authService } from "@/services/authService";
+import LyraaHeroPanel from "@/components/auth/LyraaHeroPanel";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -31,29 +32,8 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[hsl(var(--auth-panel))] flex-col justify-between p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Headphones className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-foreground">Vernal</span>
-          </div>
-          <span className="text-sm text-muted-foreground font-medium">2026</span>
-        </div>
-
-        <div className="flex-1 flex flex-col justify-center max-w-lg">
-          <h2 className="text-3xl font-bold text-foreground leading-tight">
-            Don't Worry, We've Got You Covered
-          </h2>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
-            Reset your password in seconds and get back to creating amazing voice content with Vernal.
-          </p>
-        </div>
-
-        <div />
-      </div>
+      {/* Left panel — Lyraa hero */}
+      <LyraaHeroPanel />
 
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 bg-background">

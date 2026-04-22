@@ -1,48 +1,35 @@
 import { api } from "./api";
 import { API_ROUTES } from "./apiRoutes";
+import type { AITrainingState } from "@/components/ai-training/types";
 
-export interface FAQ {
-  question: string;
-  answer: string;
+export interface AITrainingPayload extends AITrainingState {
+  systemPrompt?: string;
 }
 
-export interface AITrainingConfig {
-  id?: string;
-  aiName: string;
-  greetingMessage: string;
-  closingMessage: string;
-  companyDescription: string;
-  companyUrl: string;
-  servicesOffered: string;
-  targetAudience: string;
-  tone: "friendly" | "professional";
-  goal: "lead" | "support" | "sales";
-  responseStyle: "concise" | "detailed";
-  qualifyingQuestions: string[];
-  faqs: FAQ[];
-  customInstructions: string;
+export interface AITrainingConfig extends AITrainingPayload {
+  id?: string | number;
 }
 
 const { base, byId } = API_ROUTES.aiTraining;
 
 export const aiTrainingService = {
-  // READ
+  // GET /api/agent  — load existing config
   getConfig: () =>
     api.get<AITrainingConfig>(base).then((r) => r.data),
 
-  // CREATE
-  createConfig: (data: Omit<AITrainingConfig, "id">) =>
+  // POST /api/agent  — create new config
+  createConfig: (data: AITrainingPayload) =>
     api.post<AITrainingConfig>(base, data).then((r) => r.data),
 
-  // UPDATE (full)
-  updateConfig: (id: string, data: AITrainingConfig) =>
+  // PUT /api/agent/{id}  — full update
+  updateConfig: (id: string, data: AITrainingPayload) =>
     api.put<AITrainingConfig>(byId(id), data).then((r) => r.data),
 
-  // UPDATE (partial)
-  patchConfig: (id: string, data: Partial<AITrainingConfig>) =>
+  // PATCH /api/agent/{id}  — partial update
+  patchConfig: (id: string, data: Partial<AITrainingPayload>) =>
     api.patch<AITrainingConfig>(byId(id), data).then((r) => r.data),
 
-  // DELETE
+  // DELETE /api/agent/{id}
   deleteConfig: (id: string) =>
     api.delete(byId(id)).then((r) => r.data),
 };

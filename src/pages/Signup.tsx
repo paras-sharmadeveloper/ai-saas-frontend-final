@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Phone, User, Mail, Lock, Loader2, Eye, EyeOff, PhoneCall, MessageSquareText, MailCheck, Shield } from "lucide-react";
+import { User, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Axios from "@/utils/Axios";
+import LyraaHeroPanel from "@/components/auth/LyraaHeroPanel";
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,58 +39,10 @@ export default function Signup() {
     }
   };
 
-  const steps = [
-    { icon: PhoneCall, title: "AI Picks Up", desc: "Your agent answers every call instantly, 24/7" },
-    { icon: MessageSquareText, title: "Smart Conversation", desc: "Handles queries with natural, human-like responses" },
-    { icon: MailCheck, title: "Email Delivery", desc: "Transcript & recording sent to your inbox automatically" },
-    { icon: Shield, title: "Never Miss A Lead", desc: "Every caller gets a professional response, always" },
-  ];
-
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[hsl(var(--auth-panel))] flex-col justify-between p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <Phone className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-foreground">Vernal</span>
-          </div>
-          <span className="text-sm text-muted-foreground font-medium">AI Agent</span>
-        </div>
-
-        <div className="flex-1 flex flex-col justify-center max-w-lg">
-          <h2 className="text-3xl font-bold text-foreground leading-tight">
-            AI-Powered Call Agent For Your Business
-          </h2>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
-            Set up your AI agent in minutes. It answers calls, talks to your customers, and emails you the full transcript & recording instantly.
-          </p>
-
-          {/* How it works */}
-          <div className="mt-8 space-y-3">
-            {steps.map(({ icon: Icon, title, desc }, i) => (
-              <div
-                key={title}
-                className="flex items-start gap-4 bg-card rounded-xl p-4 border border-border shadow-sm"
-                style={{ animation: `fade-in 0.4s ease-out ${i * 0.15}s both` }}
-              >
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-foreground">{title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
-                </div>
-                <span className="ml-auto text-xs font-bold text-primary/40 shrink-0">0{i + 1}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div />
-      </div>
+      {/* Left panel — Lyraa hero */}
+      <LyraaHeroPanel />
 
       {/* Right panel */}
       <div className="flex-1 flex items-center justify-center p-6 bg-background">

@@ -1,9 +1,7 @@
-
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import aiAvatar from "@/assets/ai-avatar.png";
 import { WelcomeStep } from "@/components/ai-training/WelcomeStep";
 import { CompanyStep } from "@/components/ai-training/CompanyStep";
 import { ServicesStep } from "@/components/ai-training/ServicesStep";
@@ -13,8 +11,8 @@ import { ReviewStep } from "@/components/ai-training/ReviewStep";
 import { StepIndicator } from "@/components/ai-training/StepIndicator";
 import { AvatarDisplay } from "@/components/ai-training/AvatarDisplay";
 import { generateSystemPrompt } from "@/components/ai-training/generatePrompt";
-import type { AITrainingState, Step, ServiceItem } from "@/components/ai-training/types";
-import { Volume2 } from "lucide-react";
+import type { AITrainingState, Step } from "@/components/ai-training/types";
+import { aiTrainingService } from "@/services/aiTrainingService";
 
 const STEPS: { key: Step; label: string }[] = [
   { key: "welcome", label: "Welcome" },
@@ -78,17 +76,38 @@ export default function AITraining() {
     setState((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleLaunch = () => {
+  const handleLaunch = async () => {
     setSaving(true);
     const payload = {
-      ...state,
-      systemPrompt: isEditingPrompt ? editablePrompt : generatedPrompt,
+      company_name:  state.companyName,
+      business_type: state.services.map(s => s.name).join(", "),
+      system_prompt: isEditingPrompt ? editablePrompt : generatedPrompt,
+      first_message: `Hi! I'm ${state.agentName || "your AI assistant"}. How can I help you today?`,
+      language:      state.language,
+      // extra fields stored in DB
+      website:              state.website,
+      description:          state.description,
+      tone:                 state.tone,
+      agent_name:           state.agentName,
+      selected_voice_id:    state.selectedVoiceId,
+      questions:            state.questions,
+      escalation_triggers:  state.escalationTriggers,
+      call_goal:            state.callGoal,
+      services:             state.services,
     };
-    console.log("Creating agent with:", payload);
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      const { api } = await import("@/services/api");
+      const { API_ROUTES } = await import("@/services/apiRoutes");
+      await api.post(API_ROUTES.agentCreate.create, payload);
       toast.success("AI Agent configured successfully! 🚀");
-    }, 1500);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        "Failed to save configuration";
+      toast.error(msg);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
