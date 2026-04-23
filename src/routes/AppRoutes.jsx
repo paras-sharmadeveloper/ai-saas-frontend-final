@@ -18,6 +18,8 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import LoginSuccess from "../pages/LoginSuccess";
 import Onboarding from "../pages/Onboarding";
+import SubscribePlan from "../pages/SubscribePlan";
+import Subscribe from "../pages/Subscribe";
 import NotFound from "../pages/NotFound";
 
 import PrivateRoute from "./PrivateRoute";
@@ -52,6 +54,7 @@ const AppRoutes = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login-success" element={<LoginSuccess />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/subscribe-plan" element={<SubscribePlan />} />
 
       {/* Private */}
       <Route element={<PrivateRoute />}>
@@ -66,6 +69,7 @@ const AppRoutes = () => {
           <Route path="customers" element={<Customers />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="billing" element={<Billing />} />
+          <Route path="subscribe" element={<Subscribe />} />
         </Route>
       </Route>
 

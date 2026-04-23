@@ -7,6 +7,7 @@ import {
   CreditCard,
   Settings,
   HelpCircle,
+  Sparkles,
 } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 

@@ -40,11 +40,15 @@ export default function Dashboard() {
   useEffect(() => {
     dashboardService
       .getData()
-      .then((d) => {
+      .then(async (d) => {
         setData(d);
-        // Always redirect to onboarding if no phone number assigned — no bypass
-        if (!d.phone_numbers?.length) {
-          navigate("/onboarding", { replace: true });
+        try {
+          const res = await api.get(API_ROUTES.subscription.validate);
+          if (res.data?.data === null || res.data?.data === undefined) {
+            navigate("/subscribe-plan", { replace: true });
+          }
+        } catch {
+          navigate("/subscribe-plan", { replace: true });
         }
       })
       .catch(() => toast.error("Failed to load dashboard"))

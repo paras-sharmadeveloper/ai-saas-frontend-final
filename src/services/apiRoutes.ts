@@ -98,6 +98,11 @@ export const API_ROUTES = {
     recording: "/call/recording",
   },
 
+  // Subscription
+  subscription: {
+    validate: "/subscription/validate",
+  },
+
   // Stripe / Billing
   stripe: {
     plans: "/stripe/plans",

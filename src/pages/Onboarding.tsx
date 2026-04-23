@@ -27,7 +27,6 @@ const STEPS = [
 ];
 
 const PLANS = [
-  { id: "basic", label: "Basic", price: "$0", desc: "Get started for free", features: ["1 AI Agent", "100 calls/month"] },
   { id: "pro", label: "Pro", price: "$49", desc: "For growing businesses", features: ["5 AI Agents", "2,000 calls/month"], popular: true },
   { id: "enterprise", label: "Enterprise", price: "$199", desc: "For large teams", features: ["Unlimited Agents", "Unlimited calls"] },
 ];
@@ -79,7 +78,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState("basic");
+  const [selectedPlan, setSelectedPlan] = useState("pro");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [assignedNumber, setAssignedNumber] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(5);
