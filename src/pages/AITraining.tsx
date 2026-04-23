@@ -79,7 +79,6 @@ export default function AITraining() {
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
-
   const generatePrompt = async () => {
     setIsGeneratingPrompt(true);
     try {
