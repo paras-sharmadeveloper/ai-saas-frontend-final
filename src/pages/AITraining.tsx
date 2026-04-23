@@ -14,8 +14,8 @@ import { generateSystemPrompt } from "@/components/ai-training/generatePrompt";
 import { AgentDashboard } from "@/pages/AgentDashboard";
 import type { AITrainingState, Step } from "@/components/ai-training/types";
 import { aiTrainingService } from "@/services/aiTrainingService";
-const { api } = await import("@/services/api");
-const { API_ROUTES } = await import("@/services/apiRoutes");
+import { api } from "@/services/api";
+import { API_ROUTES } from "@/services/apiRoutes";
 const STEPS: { key: Step; label: string }[] = [
   { key: "welcome", label: "Welcome" },
   { key: "company", label: "Company Info" },
