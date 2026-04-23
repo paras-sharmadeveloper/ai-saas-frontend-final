@@ -15,6 +15,7 @@ export interface CallMessage {
 
 export interface Call {
   id?: string | number;
+  uuid:string;
   conversation_id?: string;
   user_id?: number;
   agent_id?: number;

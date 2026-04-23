@@ -52,6 +52,10 @@ export const API_ROUTES = {
   },
   agentCreate: {
     create: "/agent/create",
+    generatePrompt: "/agent/generate-prompt", 
+    myAgent:         "/agent/get-my-agent",         
+    updateKnowledge: "/agent/knowledge", 
+    update:          "/agent/update/:id",
     updatePrompt: (id: string) => `/agent/${id}/prompt`,
   },
 
@@ -60,11 +64,16 @@ export const API_ROUTES = {
     base: "/agent",
     byId: (id: string) => `/agent/${id}`,
   },
+  knowledge: {
+    add:    "/agent/knowledge",
+    list:   "/agent/knowledge/:clientId",
+    delete: "/agent/knowledge/:id",
+  },
 
   // Agent (same routes, alias)
   agent: {
     base: "/agent",
-    byId: (id: string) => `/agent/${id}`,
+    byId: (id: string) => `/agent/${id}`, 
   },
 
   // Customers

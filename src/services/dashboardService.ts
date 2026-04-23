@@ -23,6 +23,7 @@ export interface DashboardRecentCall {
   intent?: string;
   duration?: string;
   date?: string;
+  uuid:String;
 }
 
 export interface DashboardData {

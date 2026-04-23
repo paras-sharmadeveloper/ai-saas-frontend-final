@@ -27,9 +27,9 @@ const STEPS = [
 ];
 
 const PLANS = [
-  { id: "basic",      label: "Basic",      price: "$0",   desc: "Get started for free",    features: ["1 AI Agent", "100 calls/month"] },
-  { id: "pro",        label: "Pro",        price: "$49",  desc: "For growing businesses",   features: ["5 AI Agents", "2,000 calls/month"], popular: true },
-  { id: "enterprise", label: "Enterprise", price: "$199", desc: "For large teams",           features: ["Unlimited Agents", "Unlimited calls"] },
+  { id: "basic", label: "Basic", price: "$0", desc: "Get started for free", features: ["1 AI Agent", "100 calls/month"] },
+  { id: "pro", label: "Pro", price: "$49", desc: "For growing businesses", features: ["5 AI Agents", "2,000 calls/month"], popular: true },
+  { id: "enterprise", label: "Enterprise", price: "$199", desc: "For large teams", features: ["Unlimited Agents", "Unlimited calls"] },
 ];
 
 // Stripe payment form component
@@ -89,7 +89,7 @@ export default function Onboarding() {
     dashboardService
       .getData()
       .then((d) => {
-      
+
         // Always redirect to onboarding if no phone number assigned — no bypass
         if (d.phone_numbers?.length) {
           navigate("/dashboard", { replace: true });
@@ -97,7 +97,7 @@ export default function Onboarding() {
 
       })
       .catch(() => toast.error("Failed to load dashboard"))
- 
+
   }, []);
 
 
@@ -189,9 +189,9 @@ export default function Onboarding() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Phone className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">Vernal</span>
+            <span className="font-bold text-xl">Lyraa</span>
           </div>
-          <h1 className="text-2xl font-bold">Welcome to Vernal</h1>
+          <h1 className="text-2xl font-bold">Welcome to Lyraa</h1>
           <p className="text-muted-foreground mt-1 text-sm">Let's get your AI voice agent set up in minutes</p>
         </div>
 
@@ -199,10 +199,9 @@ export default function Onboarding() {
         <div className="flex items-center justify-center gap-3">
           {STEPS.map((s, i) => (
             <div key={s.id} className="flex items-center gap-3">
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                step === s.id ? "bg-primary text-primary-foreground" :
-                step > s.id ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
-              }`}>
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${step === s.id ? "bg-primary text-primary-foreground" :
+                  step > s.id ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
+                }`}>
                 <s.icon className="w-3.5 h-3.5" />
                 <span>{s.label}</span>
               </div>
@@ -339,7 +338,7 @@ export default function Onboarding() {
               <CheckCircle className="w-24 h-24 text-success mx-auto" />
               <div>
                 <h1 className="text-3xl font-bold">
-                  Welcome to Vernal{form.company_name ? `, ${form.company_name}` : ""}! 🎉
+                  Welcome to Lyraa{form.company_name ? `, ${form.company_name}` : ""}! 🎉
                 </h1>
                 <p className="text-muted-foreground mt-3">
                   Your AI voice agent is ready to go.

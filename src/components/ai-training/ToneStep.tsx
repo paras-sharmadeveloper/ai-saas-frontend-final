@@ -5,11 +5,18 @@ import { api } from "@/services/api";
 import { API_ROUTES } from "@/services/apiRoutes";
 import type { AITrainingState } from "./types";
 
-type ToneItem     = { id: number; name: string; description?: string };
+type ToneItem = { id: number; name: string; description?: string };
 type LanguageItem = { id: number; name: string };
-type VoiceType    = { id: number; name: string };
-type VoiceItem    = { id: number; name: string; style?: string; audio_url?: string; voice_type?: VoiceType; voice_type_id?: number };
-
+type VoiceType = { id: number; name: string };
+type VoiceItem = {
+  id: number;
+  name: string;
+  style?: string;
+  audio_url?: string;
+  voice_type?: VoiceType;
+  voice_type_id?: number;
+  elevenlabs_voice_id?: string;
+};
 type Props = {
   state: AITrainingState;
   update: <K extends keyof AITrainingState>(key: K, value: AITrainingState[K]) => void;
@@ -17,26 +24,25 @@ type Props = {
 
 export function ToneStep({ state, update }: Props) {
   const [tones, setTones] = useState<ToneItem[]>([
-    { id: 1, name: "Friendly",     description: "Warm and approachable" },
+    { id: 1, name: "Friendly", description: "Warm and approachable" },
     { id: 2, name: "Professional", description: "Formal and business-like" },
-    { id: 3, name: "Casual",       description: "Relaxed and conversational" },
+    { id: 3, name: "Casual", description: "Relaxed and conversational" },
   ]);
   const [languages, setLanguages] = useState<LanguageItem[]>([
-    { id: 1, name: "English" },
-    { id: 2, name: "Hindi" },
-    { id: 3, name: "Hinglish" },
+    { id: 1, name: "en" },
+    { id: 2, name: "hi" },
   ]);
   const [voiceTypes, setVoiceTypes] = useState<VoiceType[]>([
     { id: 1, name: "Female" },
     { id: 2, name: "Male" },
   ]);
   const [voices, setVoices] = useState<VoiceItem[]>([
-    { id: 1, name: "Sarah",  style: "American, warm",       voice_type_id: 1 },
-    { id: 2, name: "Emily",  style: "British, professional", voice_type_id: 1 },
-    { id: 3, name: "Priya",  style: "Indian, friendly",      voice_type_id: 1 },
-    { id: 4, name: "James",  style: "American, confident",   voice_type_id: 2 },
-    { id: 5, name: "Oliver", style: "British, calm",         voice_type_id: 2 },
-    { id: 6, name: "Raj",    style: "Indian, energetic",     voice_type_id: 2 },
+    { id: 1, name: "Sarah", style: "American, warm", voice_type_id: 1 },
+    { id: 2, name: "Emily", style: "British, professional", voice_type_id: 1 },
+    { id: 3, name: "Priya", style: "Indian, friendly", voice_type_id: 1 },
+    { id: 4, name: "James", style: "American, confident", voice_type_id: 2 },
+    { id: 5, name: "Oliver", style: "British, calm", voice_type_id: 2 },
+    { id: 6, name: "Raj", style: "Indian, energetic", voice_type_id: 2 },
   ]);
   const [selectedTypeId, setSelectedTypeId] = useState<number>(1);
   const [playingId, setPlayingId] = useState<number | null>(null);
@@ -49,16 +55,32 @@ export function ToneStep({ state, update }: Props) {
       api.get(API_ROUTES.voiceTypes.base).then(r => r.data),
       api.get(API_ROUTES.voices.base).then(r => r.data),
     ]).then(([t, l, vt, v]) => {
-      const tonesArr  = Array.isArray(t)  ? t  : t?.data  ?? [];
-      const langsArr  = Array.isArray(l)  ? l  : l?.data  ?? [];
-      const typesArr  = Array.isArray(vt) ? vt : vt?.data ?? [];
-      const voicesArr = Array.isArray(v)  ? v  : v?.data  ?? [];
-      if (tonesArr.length)  setTones(tonesArr);
-      if (langsArr.length)  setLanguages(langsArr);
-      if (typesArr.length)  { setVoiceTypes(typesArr); setSelectedTypeId(typesArr[0].id); }
-      if (voicesArr.length) setVoices(voicesArr);
-    }).catch(() => { /* keep static fallback */ });
+      const tonesArr = Array.isArray(t) ? t : t?.data ?? [];
+      const langsArr = Array.isArray(l) ? l : l?.data ?? [];
+      const typesArr = Array.isArray(vt) ? vt : vt?.data ?? [];
+
+      if (tonesArr.length) setTones(tonesArr);
+      if (langsArr.length) setLanguages(langsArr);
+      if (typesArr.length) {
+        setVoiceTypes(typesArr);
+        setSelectedTypeId(typesArr[0].id);
+      }
+
+      const raw = v?.voices ?? v?.data?.voices ?? {};
+      const allVoices = [
+        ...(raw.female ?? []),
+        ...(raw.male ?? []),
+      ].map(voice => ({
+        ...voice,
+        name: voice.name?.split(" - ")[0] ?? voice.name,
+        style: voice.name?.split(" - ")[1] ?? voice.style ?? "",
+      }));
+
+      if (allVoices.length) setVoices(allVoices);
+
+    }).catch(() => { });
   }, []);
+
 
   const filteredVoices = voices.filter(v =>
     (v.voice_type?.id ?? v.voice_type_id) === selectedTypeId
@@ -85,18 +107,20 @@ export function ToneStep({ state, update }: Props) {
       <div>
         <p className="text-sm font-medium mb-2 text-muted-foreground">Tone</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
           {tones.map(t => (
             <button
               key={t.id}
               onClick={() => update("tone", t.name.toLowerCase())}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
-                state.tone === t.name.toLowerCase()
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border hover:border-primary/40"
-              }`}
+              className={`p-4 rounded-xl border-2 text-left transition-all ${state.tone === t.name.toLowerCase()   // ✅ both lowercase = safe compare
+                ? "border-primary bg-primary/5 shadow-sm"
+                : "border-border hover:border-primary/40"
+                }`}
             >
               <div className="font-semibold text-sm">{t.name}</div>
-              {t.description && <div className="text-xs text-muted-foreground mt-0.5">{t.description}</div>}
+              {t.description && (
+                <div className="text-xs text-muted-foreground mt-0.5">{t.description}</div>
+              )}
             </button>
           ))}
         </div>
@@ -110,11 +134,10 @@ export function ToneStep({ state, update }: Props) {
             <button
               key={l.id}
               onClick={() => update("language", l.name.toLowerCase())}
-              className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
-                state.language === l.name.toLowerCase()
-                  ? "border-primary bg-primary/5 text-primary"
-                  : "border-border hover:border-primary/40 text-muted-foreground"
-              }`}
+              className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${state.language === l.name.toLowerCase()
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border hover:border-primary/40 text-muted-foreground"
+                }`}
             >
               {l.name}
             </button>
@@ -141,11 +164,10 @@ export function ToneStep({ state, update }: Props) {
             <button
               key={vt.id}
               onClick={() => setSelectedTypeId(vt.id)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                selectedTypeId === vt.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${selectedTypeId === vt.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
             >
               {vt.name} Voices
             </button>
@@ -156,12 +178,11 @@ export function ToneStep({ state, update }: Props) {
           {filteredVoices.map(v => (
             <button
               key={v.id}
-              onClick={() => update("selectedVoiceId", String(v.id))}
-              className={`p-3 rounded-xl border-2 text-left transition-all ${
-                state.selectedVoiceId === String(v.id)
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border hover:border-primary/40"
-              }`}
+              onClick={() => update("selectedVoiceId", v.elevenlabs_voice_id!)}
+              className={`p-3 rounded-xl border-2 text-left transition-all ${state.selectedVoiceId === v.elevenlabs_voice_id
+                ? "border-primary bg-primary/5 shadow-sm"
+                : "border-border hover:border-primary/40"
+                }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="font-semibold text-sm">{v.name}</span>

@@ -50,14 +50,14 @@ export default function ResetPassword() {
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <Headphones className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg text-foreground">Vernal</span>
+          <span className="font-bold text-lg text-foreground">Lyraa</span>
         </div>
         <div className="flex-1 flex flex-col justify-center max-w-lg">
           <h2 className="text-3xl font-bold text-foreground leading-tight">
             Set Your New Password
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Choose a strong password to keep your Vernal account secure.
+            Choose a strong password to keep your Lyraa account secure.
           </p>
         </div>
         <div />

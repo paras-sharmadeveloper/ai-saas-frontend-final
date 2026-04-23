@@ -102,7 +102,7 @@ export default function Calls() {
                   <TableRow
                     key={c.id}
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => navigate(`/calls/${c.id}`)}
+                    onClick={() => navigate(`/calls/${c.uuid}`)}
                   >
                     <TableCell className="font-medium">{getCustomerName(c)}</TableCell>
                     <TableCell className="text-muted-foreground">{getCustomerPhone(c)}</TableCell>
