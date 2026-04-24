@@ -37,7 +37,7 @@ const mainMenu = [
 const otherMenu = [
   { label: "Billing", icon: CreditCard, path: "/billing" },
   { label: "Settings", icon: Settings, path: "/settings" },
-  { label: "Help Center", icon: HelpCircle, path: "/help" },
+  // { label: "Help Center", icon: HelpCircle, path: "/help" },
 ];
 
 interface AppSidebarProps {
