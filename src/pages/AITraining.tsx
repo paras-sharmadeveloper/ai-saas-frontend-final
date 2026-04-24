@@ -79,8 +79,19 @@ export default function AITraining() {
   useEffect(() => {
     contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
+
   const generatePrompt = async () => {
     setIsGeneratingPrompt(true);
+    setEditablePrompt(""); // Clear first
+
+    // Start fake streaming animation
+    const placeholder = "Generating your prompt...";
+    let i = 0;
+    const interval = setInterval(() => {
+      setEditablePrompt(placeholder.slice(0, i));
+      i = i < placeholder.length ? i + 1 : 0; // loop it
+    }, 60);
+
     try {
       const res = await api.post(API_ROUTES.agentCreate.generatePrompt, {
         company_name: state.companyName,
@@ -89,22 +100,60 @@ export default function AITraining() {
         description: state.description,
         agent_name: state.agentName,
         tone: state.tone,
-        language: state.language || "en",
+        language: "en",
         call_goal: state.callGoal,
         services: state.services,
         questions: state.questions,
         escalation_triggers: state.escalationTriggers,
       });
+
+      clearInterval(interval); // Stop animation
+
       if (res.data.success) {
         setGeneratedPrompt(res.data.prompt);
-        setEditablePrompt(res.data.prompt);
+
+        // Typewriter effect for the real prompt
+        let j = 0;
+        const typewriter = setInterval(() => {
+          setEditablePrompt(res.data.prompt.slice(0, j));
+          j++;
+          if (j > res.data.prompt.length) clearInterval(typewriter);
+        }, 10);
       }
     } catch (err) {
+      clearInterval(interval);
+      setEditablePrompt("");
       console.error("Prompt generation failed", err);
     } finally {
       setIsGeneratingPrompt(false);
     }
   };
+  // const generatePrompt = async () => {
+  //   setIsGeneratingPrompt(true);
+  //   try {
+  //     const res = await api.post(API_ROUTES.agentCreate.generatePrompt, {
+  //       company_name: state.companyName,
+  //       business_type: state.services.map(s => s.name).join(", "),
+  //       website: state.website,
+  //       description: state.description,
+  //       agent_name: state.agentName,
+  //       tone: state.tone,
+  //       language: state.language || "en",
+  //       call_goal: state.callGoal,
+  //       services: state.services,
+  //       questions: state.questions,
+  //       escalation_triggers: state.escalationTriggers,
+  //     });
+  //     if (res.data.success) {
+  //       setGeneratedPrompt(res.data.prompt);
+  //       setEditablePrompt(res.data.prompt);
+  //     }
+  //   } catch (err) {
+  //     console.error("Prompt generation failed", err);
+  //   } finally {
+  //     setIsGeneratingPrompt(false);
+  //   }
+  // };
 
   const goNext = () => {
     if (stepIndex < STEPS.length - 1) setStep(STEPS[stepIndex + 1].key);

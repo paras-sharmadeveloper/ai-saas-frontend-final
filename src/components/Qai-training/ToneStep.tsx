@@ -8,7 +8,7 @@ const TONE_OPTIONS = [
   { id: "casual", label: "Casual", desc: "Relaxed and conversational" },
 ];
 
-const LANGUAGES = ["English", "Spanish", "French", "German", "Hindi", "Portuguese"];
+const LANGUAGES = ["en", "sp", "fr"];
 const GOALS = [
   { id: "lead_generation", label: "Lead Generation" },
   { id: "customer_support", label: "Customer Support" },
@@ -30,9 +30,8 @@ export function ToneStep({ state, update }: Props) {
           <button
             key={t.id}
             onClick={() => update("tone", t.id)}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
-              state.tone === t.id ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
-            }`}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${state.tone === t.id ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
+              }`}
           >
             <div className="font-semibold text-sm">{t.label}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{t.desc}</div>
