@@ -199,7 +199,7 @@ export default function Onboarding() {
           {STEPS.map((s, i) => (
             <div key={s.id} className="flex items-center gap-3">
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${step === s.id ? "bg-primary text-primary-foreground" :
-                  step > s.id ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
+                step > s.id ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"
                 }`}>
                 <s.icon className="w-3.5 h-3.5" />
                 <span>{s.label}</span>
