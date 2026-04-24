@@ -65,8 +65,8 @@ export default function DashboardLayout() {
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate("/admin/settings")}>Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/admin/billing")}>Billing</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/settings")}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/billing")}>Billing</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

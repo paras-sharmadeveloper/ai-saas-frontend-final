@@ -7,9 +7,10 @@ import {
   CreditCard,
   Settings,
   HelpCircle,
-  Sparkles,
+  Sparkles, LogOut
 } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
+
 
 function LyraaMark({ className = "w-8 h-8" }: { className?: string }) {
   return (
@@ -60,6 +61,11 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
       </p>
     ) : <div className="mt-4" />;
   const user = useAppSelector((state) => (state.auth as { user: { name?: string; email?: string } | null }).user);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
   return (
     <aside
       className={`flex flex-col bg-sidebar h-screen sticky top-0 transition-all duration-200 ${collapsed ? "w-[60px]" : "w-56"
@@ -100,10 +106,7 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-warning text-warning-foreground flex items-center justify-center text-xs font-bold shrink-0">
               {user?.name
-                ? user.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
+                ? user.name.split(" ").map((n) => n[0]).join("")
                 : "U"}
             </div>
             <div className="flex-1 min-w-0">
@@ -114,6 +117,13 @@ export default function AppSidebar({ collapsed }: AppSidebarProps) {
                 {user?.email || "User"}
               </p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
