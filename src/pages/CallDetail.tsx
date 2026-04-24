@@ -54,7 +54,7 @@ export default function CallDetail() {
   const customerPhone = call.customer?.phone ?? call.phone ?? "—";
   const transcript = call.transcript ?? call.messages ?? [];
   const recordingUrl = call.recording_url
-    ? `${import.meta.env.VITE_API_BASE_URL?.replace("/api", "")}${call.recording_url}`
+    ? `${call.recording_url}`
     : null;
 
   return (
@@ -86,8 +86,8 @@ export default function CallDetail() {
                 <div><p className="text-xs text-muted-foreground">Intent</p>
                   <Badge className={
                     call.intent === "lead" ? "bg-green-100 text-green-700 border-0 mt-0.5 capitalize" :
-                    call.intent === "complaint" ? "bg-red-100 text-red-700 border-0 mt-0.5 capitalize" :
-                    "bg-blue-100 text-blue-700 border-0 mt-0.5 capitalize"
+                      call.intent === "complaint" ? "bg-red-100 text-red-700 border-0 mt-0.5 capitalize" :
+                        "bg-blue-100 text-blue-700 border-0 mt-0.5 capitalize"
                   }>{call.intent ?? "—"}</Badge>
                 </div>
                 <div><p className="text-xs text-muted-foreground">Status</p>
@@ -163,9 +163,8 @@ export default function CallDetail() {
                         <AvatarFallback className="bg-muted"><User className="w-3.5 h-3.5 text-muted-foreground" /></AvatarFallback>
                       </Avatar>
                     )}
-                    <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm ${
-                      isUser ? "bg-muted text-foreground" : "bg-primary text-primary-foreground"
-                    }`}>
+                    <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm ${isUser ? "bg-muted text-foreground" : "bg-primary text-primary-foreground"
+                      }`}>
                       <p className="text-[10px] font-semibold opacity-60 mb-0.5">{isUser ? "User" : "Agent"}{timeLabel && ` · ${timeLabel}`}</p>
                       <p className="leading-relaxed">{text}</p>
                     </div>
