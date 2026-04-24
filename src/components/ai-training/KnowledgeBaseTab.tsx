@@ -200,7 +200,7 @@ export function KnowledgeBaseTab({ clientId }: Props) {
                     className="w-full rounded-xl h-11"
                 >
                     {saving
-                        ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading to ElevenLabs...</>
+                        ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading ...</>
                         : "Add to Knowledge Base"
                     }
                 </Button>

@@ -100,7 +100,7 @@ export default function AITraining() {
         description: state.description,
         agent_name: state.agentName,
         tone: state.tone,
-        language: "en",
+        language: state.language || "en",
         call_goal: state.callGoal,
         services: state.services,
         questions: state.questions,
