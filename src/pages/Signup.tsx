@@ -28,7 +28,8 @@ export default function Signup() {
       // optional: auto login
       localStorage.setItem("token", res.data.token);
 
-      navigate("/login");
+      navigate("/verify-email");
+
 
     } catch (error: any) {
       toast.error(

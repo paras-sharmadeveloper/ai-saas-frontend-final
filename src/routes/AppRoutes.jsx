@@ -11,6 +11,7 @@ import CallDetail from "../pages/CallDetail";
 import Customers from "../pages/Customers";
 import SettingsPage from "../pages/SettingsPage";
 import Billing from "../pages/Billing";
+import VerifyEmail from "../pages/VerifyEmail";
 
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
@@ -55,6 +56,7 @@ const AppRoutes = () => {
       <Route path="/login-success" element={<LoginSuccess />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/subscribe-plan" element={<SubscribePlan />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
 
       {/* Private */}
       <Route element={<PrivateRoute />}>

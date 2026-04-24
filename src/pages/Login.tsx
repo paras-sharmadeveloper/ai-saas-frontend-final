@@ -9,14 +9,28 @@ import Axios from "@/utils/Axios";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/redux/authSlice";
 import LyraaHeroPanel from "@/components/auth/LyraaHeroPanel";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+
+
+
 
 export default function Login() {
+
+  const [searchParams] = useSearchParams();
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      toast.success("Email verified! Please login.");
+    }
+  }, []);
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -56,11 +70,28 @@ export default function Login() {
 
     } catch (error) {
       const msg = error.response?.data?.message || "Login failed.";
-
+      const status = error.response?.status;
+      if (status === 403) {
+        toast.error("Please verify your email first.");
+        setShowResend(true); // ✅ link show karo
+        return;
+      }
       toast.error(msg);
       setMessage(msg);
     } finally {
       setLoading(false);
+    }
+  };
+  const handleResend = async () => {
+    setResendLoading(true);
+    try {
+      await Axios.post("/email/resend-guest", { email: form.email });
+      toast.success("Verification email sent!");
+      setShowResend(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to resend.");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -134,7 +165,19 @@ export default function Login() {
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Sign In
             </Button>
-
+            {showResend && (
+              <p className="text-sm text-center text-muted-foreground">
+                Didn't get the email?{" "}
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  className="text-primary font-medium hover:underline disabled:opacity-50"
+                >
+                  {resendLoading ? "Sending..." : "Resend verification email"}
+                </button>
+              </p>
+            )}
             {/* <div className="relative">
               <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
               <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-3 text-muted-foreground">or</span></div>
