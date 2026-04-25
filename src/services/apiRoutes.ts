@@ -56,6 +56,7 @@ export const API_ROUTES = {
     myAgent:         "/agent/get-my-agent",         
     updateKnowledge: "/agent/knowledge", 
     update:          "/agent/update/:id",
+    assignNumber: "/agent/assign-number", 
     updatePrompt: (id: string) => `/agent/${id}/prompt`,
   },
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pencil, BookOpen, Phone, Bot } from "lucide-react";
+import { Pencil, BookOpen, Phone, Bot, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ export function AgentDashboard({ client, onAgentUpdated }: {
     const [activeTab, setActiveTab] = useState<"overview" | "edit" | "knowledge">("overview");
     const [knowledgeText, setKnowledgeText] = useState("");
     const [saving, setSaving] = useState(false);
+    const [assigningNumber, setAssigningNumber] = useState(false);
 
     const config = client.agent_config;
     const prompt = client.agent_prompt;
@@ -32,6 +33,24 @@ export function AgentDashboard({ client, onAgentUpdated }: {
             toast.error("Failed to update knowledge base");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleAssignNumber = async () => {
+        setAssigningNumber(true);
+        try {
+            const res = await api.post(API_ROUTES.agentCreate.assignNumber);
+            if (res.data.success) {
+                toast.success(`${res.data.phone_number} assigned! ✅`);
+                onAgentUpdated({
+                    ...client,
+                    phone_number: { number: res.data.phone_number, is_assigned: true }
+                });
+            }
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message ?? "Failed to assign number");
+        } finally {
+            setAssigningNumber(false);
         }
     };
 
@@ -96,7 +115,38 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                             {prompt?.system_prompt ?? "—"}
                         </div>
                     </div>
+                    <div className="flex justify-between py-2 border-b">
+                        <span className="text-sm text-muted-foreground">Phone Number</span>
+                        <div className="flex items-center gap-2">
+                            {client.phone_number ? (
+                                <>
+                                    <span className="text-sm font-medium">{client.phone_number.number}</span>
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                        Active ✓
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-xs text-muted-foreground">Not assigned</span>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="rounded-full h-7 text-xs"
+                                        onClick={handleAssignNumber}
+                                        disabled={assigningNumber}
+                                    >
+                                        {assigningNumber
+                                            ? <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                            : <Phone className="w-3 h-3 mr-1" />
+                                        }
+                                        {assigningNumber ? "Assigning..." : "Assign Number"}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
+
             )}
 
             {/* Edit Tab */}
