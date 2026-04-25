@@ -108,13 +108,6 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                             <span className="text-sm font-medium capitalize">{value ?? "—"}</span>
                         </div>
                     ))}
-
-                    <div className="pt-2">
-                        <p className="text-xs text-muted-foreground mb-1">System Prompt</p>
-                        <div className="bg-muted rounded-xl p-3 text-xs text-foreground max-h-40 overflow-y-auto whitespace-pre-wrap">
-                            {prompt?.system_prompt ?? "—"}
-                        </div>
-                    </div>
                     <div className="flex justify-between py-2 border-b">
                         <span className="text-sm text-muted-foreground">Phone Number</span>
                         <div className="flex items-center gap-2">
@@ -145,6 +138,13 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                             )}
                         </div>
                     </div>
+                    <div className="pt-2">
+                        <p className="text-xs text-muted-foreground mb-1">System Prompt</p>
+                        <div className="bg-muted rounded-xl p-3 text-xs text-foreground max-h-40 overflow-y-auto whitespace-pre-wrap">
+                            {prompt?.system_prompt ?? "—"}
+                        </div>
+                    </div>
+
                 </div>
 
             )}
