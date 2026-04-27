@@ -16,6 +16,40 @@ export default function CallDetail() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
+
+  const [currentTime, setCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+
+  // Waveform bars (fake amplitude — real waveform ke liye Web Audio API chahiye)
+  const BARS = 60;
+  const waveHeights = useRef(
+    Array.from({ length: BARS }, () => 20 + Math.random() * 80)
+  );
+
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2, "0")}`;
+  };
+
+  const handleWaveClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !audioDuration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    audioRef.current.currentTime = ratio * audioDuration;
+  };
+
+  const skip = (secs: number) => {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = Math.min(
+      Math.max(0, audioRef.current.currentTime + secs),
+      audioDuration
+    );
+  };
+
+
+
+
   useEffect(() => {
     if (!id) return;
     callsService
@@ -115,16 +149,92 @@ export default function CallDetail() {
           </Card>
 
           {/* Recording */}
+          {/* Recording Card */}
           {recordingUrl && (
             <Card className="shadow-sm">
-              <CardHeader><CardTitle className="text-base">Recording</CardTitle></CardHeader>
-              <CardContent>
-                <audio ref={audioRef} src={recordingUrl} onEnded={() => setPlaying(false)} className="hidden" />
-                <div className="flex items-center gap-3">
-                  <Button size="icon" variant="ghost" className="rounded-full h-10 w-10 shrink-0" onClick={togglePlay}>
-                    {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                  </Button>
-                  <p className="text-sm text-muted-foreground">{call.duration ?? ""}</p>
+              <CardHeader>
+                <CardTitle className="text-base">Recording</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <audio
+                  ref={audioRef}
+                  src={recordingUrl}
+                  onEnded={() => setPlaying(false)}
+                  onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime ?? 0)}
+                  onLoadedMetadata={() => setAudioDuration(audioRef.current?.duration ?? 0)}
+                  className="hidden"
+                />
+
+                {/* Controls Row */}
+                <div className="flex items-center justify-between">
+                  {/* Left: Skip back + Play + Skip forward */}
+                  <div className="flex items-center gap-3">
+                    {/* Skip Back 10s */}
+                    <button
+                      onClick={() => skip(-10)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+                        <text x="7" y="15" fontSize="5" fill="currentColor">10</text>
+                      </svg>
+                    </button>
+
+                    {/* Play / Pause */}
+                    <button
+                      onClick={togglePlay}
+                      className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors shrink-0"
+                    >
+                      {playing
+                        ? <Pause className="w-5 h-5 text-primary-foreground" />
+                        : <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
+                      }
+                    </button>
+
+                    {/* Skip Forward 10s */}
+                    <button
+                      onClick={() => skip(10)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z" />
+                        <text x="7" y="15" fontSize="5" fill="currentColor">10</text>
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Right: Time */}
+                  <p className="text-sm font-medium tabular-nums text-foreground">
+                    {formatTime(currentTime)}
+                    <span className="text-muted-foreground"> / {formatTime(audioDuration)}</span>
+                  </p>
+                </div>
+
+                {/* Waveform */}
+                <div
+                  className="flex items-center gap-[2px] h-16 cursor-pointer group"
+                  onClick={handleWaveClick}
+                >
+                  {waveHeights.current.map((h, i) => {
+                    const progress = audioDuration ? currentTime / audioDuration : 0;
+                    const played = i / BARS < progress;
+                    return (
+                      <div
+                        key={i}
+                        className={`flex-1 rounded-full transition-colors ${played
+                            ? "bg-primary"
+                            : "bg-primary/20 group-hover:bg-primary/30"
+                          }`}
+                        style={{ height: `${h}%` }}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Time labels */}
+                <div className="flex justify-between text-[11px] text-muted-foreground -mt-2">
+                  <span>0:00</span>
+                  <span>{formatTime(audioDuration)}</span>
                 </div>
               </CardContent>
             </Card>
