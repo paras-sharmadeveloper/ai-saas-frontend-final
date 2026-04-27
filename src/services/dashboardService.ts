@@ -7,6 +7,8 @@ export interface DashboardStats {
   missed_calls: number;
   avg_duration: string;
   total_customers: number;
+  total_duration:string;
+  total_minutes:string;
 }
 
 export interface DashboardPhoneNumber {

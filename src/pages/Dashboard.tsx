@@ -86,7 +86,7 @@ export default function Dashboard() {
     { label: "Total Calls", value: stats?.total_calls ?? 0, icon: Phone, color: "bg-primary/10 text-primary" },
     { label: "Total Leads", value: stats?.total_leads ?? 0, icon: Users, color: "bg-success/10 text-success" },
     { label: "Missed Calls", value: stats?.missed_calls ?? 0, icon: PhoneMissed, color: "bg-destructive/10 text-destructive" },
-    { label: "Avg Duration", value: stats?.avg_duration ?? "—", icon: Clock, color: "bg-warning/10 text-warning" },
+    { label: "Total Duration", value: stats?.total_duration ?? "—", icon: Clock, color: "bg-warning/10 text-warning" },
     // { label: "Total Customers", value: stats?.total_customers ?? 0, icon: Users,       color: "bg-blue-100 text-blue-600" },
   ];
 
