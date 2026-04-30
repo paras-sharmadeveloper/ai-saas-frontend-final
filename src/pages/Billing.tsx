@@ -4,32 +4,89 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, Download, Sparkles, Loader2, Crown } from "lucide-react";
+import { Check, Download, Sparkles, Loader2, Crown, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { billingService, type MyPlan, type Plan, type Invoice } from "@/services/billingService";
+import { billingService, type MyPlan, type Invoice } from "@/services/billingService";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "");
 
-const PLAN_META: Record<string, { label: string; desc: string; features: string[]; popular?: boolean }> = {
-  free:       { label: "Free",       desc: "Get started with basics",  features: ["1 AI Agent", "100 calls/month", "1 phone number", "Email support"] },
-  basic:      { label: "Basic",      desc: "Get started with basics",  features: ["1 AI Agent", "100 calls/month", "1 phone number", "Email support"] },
-  pro:        { label: "Pro",        desc: "For growing businesses",   features: ["5 AI Agents", "2,000 calls/month", "5 phone numbers", "Priority support", "Advanced analytics"], popular: true },
-  monthly:    { label: "Pro",        desc: "For growing businesses",   features: ["5 AI Agents", "2,000 calls/month", "5 phone numbers", "Priority support", "Advanced analytics"], popular: true },
-  enterprise: { label: "Enterprise", desc: "For large teams",          features: ["Unlimited Agents", "Unlimited calls", "Unlimited numbers", "24/7 support", "Custom integrations", "Dedicated CSM"] },
-};
+type BillingCycle = "monthly" | "annual" | "test";
 
-const STATIC_PLANS: Plan[] = [
-  { id: "basic",      name: "basic",      price: 0,   currency: "usd", interval: "month" },
-  { id: "pro",        name: "pro",        price: 49,  currency: "usd", interval: "month" },
-  { id: "enterprise", name: "enterprise", price: 199, currency: "usd", interval: "month" },
+interface PlanDef {
+  id: string;
+  label: string;
+  subtitle: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  currency: "$" | "₹";
+  features: string[];
+  popular?: boolean;
+  cta: string;
+  tabs: BillingCycle[];
+}
+
+const PLANS: PlanDef[] = [
+  // --- Monthly / Annual plans ---
+  {
+    id: "starter",
+    label: "Starter",
+    subtitle: "For solo operators and new businesses.",
+    monthlyPrice: 49,
+    annualPrice: 41.65,
+    currency: "$",
+    features: ["200 minutes/month", "Australian voice", "Calendar sync", "SMS follow-ups", "Email support"],
+    cta: "Start free trial",
+    tabs: ["monthly", "annual"],
+  },
+  {
+    id: "growth",
+    label: "Growth",
+    subtitle: "For growing service businesses.",
+    monthlyPrice: 129,
+    annualPrice: 109.65,
+    currency: "$",
+    features: ["800 minutes/month", "All Starter features", "CRM integrations", "Invoicing + quoting", "Smart call routing", "Priority support"],
+    popular: true,
+    cta: "Start free trial",
+    tabs: ["monthly", "annual"],
+  },
+  {
+    id: "scale",
+    label: "Scale",
+    subtitle: "For established operators and teams.",
+    monthlyPrice: 349,
+    annualPrice: 296.65,
+    currency: "$",
+    features: ["Unlimited minutes", "All Growth features", "Multi-location", "Custom voice training", "API access", "Dedicated manager"],
+    cta: "Book a demo",
+    tabs: ["monthly", "annual"],
+  },
+  // --- Test plans ---
+  // {
+  //   id: "free",
+  //   label: "Free",
+  //   subtitle: "Try it out, zero cost.",
+  //   monthlyPrice: 0,
+  //   annualPrice: 0,
+  //   currency: "₹",
+  //   features: ["1 AI Agent", "50 calls/month", "Basic voice", "Email support"],
+  //   cta: "Get started free",
+  //   tabs: ["test"],
+  // },
+  {
+    id: "test_rupee",
+    label: "Test Plan",
+    subtitle: "Two-dollar payment for testing.",
+    monthlyPrice: 2,
+    annualPrice: 2,
+    currency: "$",
+    features: ["Same as Starter", "Test payment only", "$2 charge"],
+    cta: "Pay $2 now",
+    tabs: ["test"],
+  },
 ];
-
-const getMeta = (p: Plan) =>
-  PLAN_META[p.id?.toLowerCase()] ??
-  PLAN_META[p.name?.toLowerCase()] ??
-  { label: p.name, desc: "", features: p.features ?? [] };
 
 function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
   const stripe = useStripe();
@@ -73,42 +130,46 @@ function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
+function formatPrice(plan: PlanDef, cycle: BillingCycle) {
+  const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
+  return `${plan.currency}${price}`;
+}
+
 export default function Billing() {
   const [myPlan, setMyPlan] = useState<MyPlan | null>(null);
-  const [plans, setPlans] = useState<Plan[]>(STATIC_PLANS);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [cycle, setCycle] = useState<BillingCycle>("monthly");
 
   useEffect(() => {
     Promise.all([
       billingService.getMyPlan().catch(() => null),
-      billingService.getPlans().catch(() => []),
       billingService.getInvoices().catch(() => []),
-    ]).then(([plan, planList, invoiceList]) => {
+    ]).then(([plan, invoiceList]) => {
       if (plan) setMyPlan(plan);
-      if (Array.isArray(planList) && planList.length > 0) setPlans(planList);
       if (Array.isArray(invoiceList)) setInvoices(invoiceList);
     }).finally(() => setLoading(false));
   }, []);
 
-  const isCurrentPlan = (p: Plan) =>
-    myPlan?.plan?.toLowerCase() === p.name?.toLowerCase() ||
-    myPlan?.plan?.toLowerCase() === p.id?.toLowerCase();
+  const isCurrentPlan = (planId: string) =>
+    myPlan?.plan?.toLowerCase() === planId.toLowerCase();
 
-  const handleUpgrade = async (p: Plan) => {
-    if (!p.price || Number(p.price) === 0) {
-      toast.success(`Switched to ${p.name} plan`);
+  const handleUpgrade = async (plan: PlanDef) => {
+    const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
+    
+    if (price === 0) {
+      toast.success(`Switched to ${plan.label} plan`);
       return;
     }
-    setLoadingPlan(p.id);
+    setLoadingPlan(plan.id);
     try {
-      const { client_secret } = await billingService.createPaymentIntent({ plan: p.id });
+      const { client_secret } = await billingService.createPaymentIntent({ plan: plan.id, billing_cycle: cycle });
       setClientSecret(client_secret);
-      setSelectedPlan(getMeta(p).label);
+      setSelectedPlan(plan.label);
       setDialogOpen(true);
     } catch (err: unknown) {
       const msg =
@@ -133,6 +194,13 @@ export default function Billing() {
       </div>
     );
   }
+
+  const visiblePlans = PLANS.filter((p) => p.tabs.includes(cycle));
+  const tabs: { key: BillingCycle; label: string }[] = [
+    { key: "monthly", label: "Monthly" },
+    { key: "annual", label: "Annual" },
+    { key: "test", label: "Test" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -166,14 +234,33 @@ export default function Billing() {
         </Card>
       )}
 
+      {/* Billing Cycle Toggle */}
+      <div className="flex justify-center">
+        <div className="inline-flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setCycle(tab.key)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                cycle === tab.key
+                  ? "bg-[#4f46e5] text-white shadow"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {plans.map((p) => {
-          const isCurrent = isCurrentPlan(p);
-          const meta = getMeta(p);
+        {visiblePlans.map((plan) => {
+          const isCurrent = isCurrentPlan(plan.id);
+          const price = formatPrice(plan, cycle);
           return (
-            <Card key={p.id} className={`shadow-sm relative ${isCurrent ? "border-primary ring-1 ring-primary/20" : ""}`}>
-              {(isCurrent || meta.popular) && (
+            <Card key={plan.id} className={`shadow-sm relative ${isCurrent ? "border-primary ring-1 ring-primary/20" : ""}`}>
+              {(isCurrent || plan.popular) && (
                 <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
                   <Badge className="bg-primary text-primary-foreground border-0 text-[10px] px-2.5">
                     <Sparkles className="w-3 h-3 mr-1" />
@@ -183,17 +270,19 @@ export default function Billing() {
               )}
               <CardContent className="pt-6 space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">{meta.label}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{meta.desc}</p>
+                  <h3 className="text-lg font-bold text-foreground">{plan.label}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">{plan.subtitle}</p>
                   <p className="text-3xl font-bold mt-3 text-foreground">
-                    ${Number(p.price) === 0 ? "0" : p.price}
-                    <span className="text-sm font-normal text-muted-foreground">/{p.interval ?? "month"}</span>
+                    {price}
+                    {plan.monthlyPrice !== 0 && (
+                      <span className="text-sm font-normal text-muted-foreground"> /month</span>
+                    )}
                   </p>
                 </div>
                 <ul className="space-y-2.5">
-                  {meta.features.map((f) => (
+                  {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-success shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-[#4f46e5] shrink-0" />
                       <span className="text-muted-foreground">{f}</span>
                     </li>
                   ))}
@@ -201,11 +290,11 @@ export default function Billing() {
                 <Button
                   className="w-full"
                   variant={isCurrent ? "outline" : "default"}
-                  disabled={isCurrent || loadingPlan === p.id}
-                  onClick={() => !isCurrent && handleUpgrade(p)}
+                  disabled={isCurrent || loadingPlan === plan.id}
+                  onClick={() => !isCurrent && handleUpgrade(plan)}
                 >
-                  {loadingPlan === p.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {isCurrent ? "Current Plan" : Number(p.price) === 0 ? "Select" : "Upgrade"}
+                  {loadingPlan === plan.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {isCurrent ? "Current Plan" : plan.monthlyPrice === 0 ? "Select" : "Upgrade"}
                 </Button>
               </CardContent>
             </Card>

@@ -55,7 +55,7 @@ export const billingService = {
   getInvoiceById: (id: string) =>
     api.get<Invoice>(s.invoiceById(id)).then((r) => r.data),
 
-  createPaymentIntent: (data: { plan: string }) =>
+  createPaymentIntent: (data: { plan: string; billing_cycle?: string }) =>
     api.post<PaymentIntentResponse>(s.createPaymentIntent, data).then((r) => r.data),
 
   confirmPayment: (payment_intent_id: string) =>

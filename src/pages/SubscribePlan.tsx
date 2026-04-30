@@ -4,7 +4,7 @@ import { api } from "@/services/api";
 import { API_ROUTES } from "@/services/apiRoutes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Loader2, Phone } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -12,23 +12,102 @@ import { billingService } from "@/services/billingService";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "");
 
-const PLANS = [
+function LyraaMark({ className = "w-10 h-10" }: { className?: string }) {
+  return (
+    <div className={`rounded-xl bg-[#4f46e5] flex items-center justify-center shrink-0 ${className}`}>
+      <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+        <g transform="translate(2, 12)">
+          <rect x="0" y="-2.5" width="2" height="5" rx="1" fill="#fff" opacity="0.85" />
+          <rect x="4" y="-5" width="2" height="10" rx="1" fill="#fff" opacity="0.92" />
+          <rect x="8" y="-7.5" width="2" height="15" rx="1" fill="#fff" />
+          <rect x="12" y="-4" width="2" height="8" rx="1" fill="#fff" opacity="0.92" />
+          <rect x="16" y="-6" width="2" height="12" rx="1" fill="#fff" opacity="0.85" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+type BillingCycle = "monthly" | "annual" | "test";
+
+interface PlanDef {
+  id: string;
+  label: string;
+  subtitle: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  currency: "$" | "₹";
+  features: string[];
+  popular?: boolean;
+  cta: string;
+  tabs: BillingCycle[];
+}
+
+const PLANS: PlanDef[] = [
+  // --- Monthly / Annual plans ---
   {
-    id: "pro",
-    label: "Pro",
-    price: "$49",
-    desc: "For growing businesses",
-    features: ["5 AI Agents", "2,000 calls/month"],
-    popular: true,
+    id: "starter",
+    label: "Starter",
+    subtitle: "For solo operators and new businesses.",
+    monthlyPrice: 49,
+    annualPrice: 41.65,
+    currency: "$",
+    features: ["200 minutes/month", "Australian voice", "Calendar sync", "SMS follow-ups", "Email support"],
+    cta: "Start free trial",
+    tabs: ["monthly", "annual"],
   },
   {
-    id: "enterprise",
-    label: "Enterprise",
-    price: "$199",
-    desc: "For large teams",
-    features: ["Unlimited Agents", "Unlimited calls"],
+    id: "growth",
+    label: "Growth",
+    subtitle: "For growing service businesses.",
+    monthlyPrice: 129,
+    annualPrice: 109.65,
+    currency: "$",
+    features: ["800 minutes/month", "All Starter features", "CRM integrations", "Invoicing + quoting", "Smart call routing", "Priority support"],
+    popular: true,
+    cta: "Start free trial",
+    tabs: ["monthly", "annual"],
+  },
+  {
+    id: "scale",
+    label: "Scale",
+    subtitle: "For established operators and teams.",
+    monthlyPrice: 349,
+    annualPrice: 296.65,
+    currency: "$",
+    features: ["Unlimited minutes", "All Growth features", "Multi-location", "Custom voice training", "API access", "Dedicated manager"],
+    cta: "Book a demo",
+    tabs: ["monthly", "annual"],
+  },
+  // --- Test plans ---
+  {
+    id: "free",
+    label: "Free",
+    subtitle: "Try it out, zero cost.",
+    monthlyPrice: 0,
+    annualPrice: 0,
+    currency: "₹",
+    features: ["1 AI Agent", "50 calls/month", "Basic voice", "Email support"],
+    cta: "Get started free",
+    tabs: ["test"],
+  },
+  {
+    id: "test_rupee",
+    label: "Test Plan",
+    subtitle: "One-rupee payment for testing.",
+    monthlyPrice: 1,
+    annualPrice: 1,
+    currency: "₹",
+    features: ["Same as Starter", "Test payment only", "₹1 INR charge"],
+    cta: "Pay ₹1 now",
+    tabs: ["test"],
   },
 ];
+
+function formatPrice(plan: PlanDef, cycle: BillingCycle) {
+  const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
+  return `${plan.currency}${price}`;
+}
 
 function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
   const stripe = useStripe();
@@ -66,7 +145,7 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
       <Button
         type="submit"
-        className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold rounded-xl"
+        className="w-full h-12 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-base font-semibold rounded-xl"
         disabled={!stripe || processing}
       >
         {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -78,12 +157,12 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
 
 export default function SubscribePlan() {
   const navigate = useNavigate();
-  const [selectedPlan, setSelectedPlan] = useState("pro");
+  const [cycle, setCycle] = useState<BillingCycle>("monthly");
+  const [selectedPlan, setSelectedPlan] = useState<string>("growth");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [checking, setChecking] = useState(true);
 
-  // On mount: call validate API — if data is not null redirect to dashboard, else show plans
   useEffect(() => {
     api
       .get(API_ROUTES.subscription.validate)
@@ -97,6 +176,13 @@ export default function SubscribePlan() {
       .catch(() => setChecking(false));
   }, []);
 
+  // When switching tabs, reset selected plan to the first visible one
+  const handleCycleChange = (newCycle: BillingCycle) => {
+    setCycle(newCycle);
+    const first = PLANS.find((p) => p.tabs.includes(newCycle));
+    if (first) setSelectedPlan(first.id);
+  };
+
   if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -105,10 +191,32 @@ export default function SubscribePlan() {
     );
   }
 
-  const handleContinue = async () => {
+  const visiblePlans = PLANS.filter((p) => p.tabs.includes(cycle));
+
+  const handleSelectPlan = async (planId: string) => {
+    setSelectedPlan(planId);
+    const plan = PLANS.find((p) => p.id === planId);
+    if (!plan) return;
+
+    const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
+
+    if (price === 0) {
+      setSubmitting(true);
+      try {
+        await api.post(API_ROUTES.subscription.validate, { plan: planId });
+        toast.success("Free plan activated!");
+        navigate("/dashboard", { replace: true });
+      } catch {
+        toast.error("Could not activate free plan");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const { client_secret } = await billingService.createPaymentIntent({ plan: selectedPlan });
+      const { client_secret } = await billingService.createPaymentIntent({ plan: planId, billing_cycle: cycle });
       setClientSecret(client_secret);
     } catch (err: unknown) {
       const msg =
@@ -120,85 +228,144 @@ export default function SubscribePlan() {
     }
   };
 
-  const handleSuccess = () => {
-    navigate("/dashboard", { replace: true });
-  };
-
-  const currentPlan = PLANS.find((p) => p.id === selectedPlan);
+  const tabs: { key: BillingCycle; label: string }[] = [
+    { key: "monthly", label: "Monthly" },
+    { key: "annual", label: "Annual" },
+    { key: "test", label: "Test" },
+  ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-2xl space-y-8">
+    <div className="min-h-screen bg-[#f5f4f0] flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-5xl space-y-8">
 
         {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-center gap-2.5 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Phone className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl">Lyraa</span>
+            <LyraaMark />
+            <span className="font-bold text-xl lowercase tracking-tight">lyraa</span>
           </div>
-          <h1 className="text-2xl font-bold">Choose Your Plan</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Select a plan and complete payment to get started</p>
+          <h1 className="text-3xl font-bold text-gray-900">Choose Your Plan</h1>
+          <p className="text-gray-500 mt-1 text-sm">Select a plan and complete payment to get started</p>
         </div>
 
         {!clientSecret ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {PLANS.map((p) => (
-                <Card
-                  key={p.id}
-                  className={`shadow-sm cursor-pointer transition-all ${
-                    selectedPlan === p.id
-                      ? "border-primary ring-1 ring-primary/20"
-                      : "hover:border-primary/40"
-                  }`}
-                  onClick={() => setSelectedPlan(p.id)}
-                >
-                  <CardContent className="pt-5 space-y-3">
-                    {p.popular && (
-                      <div className="text-[10px] font-semibold text-primary uppercase tracking-wider">
-                        Most Popular
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="font-bold text-base">{p.label}</h3>
-                      <p className="text-xs text-muted-foreground">{p.desc}</p>
-                      <p className="text-2xl font-bold mt-2">
-                        {p.price}
-                        <span className="text-sm font-normal text-muted-foreground">/mo</span>
-                      </p>
-                    </div>
-                    <ul className="space-y-1">
-                      {p.features.map((f) => (
-                        <li key={f} className="text-xs text-muted-foreground flex items-center gap-1.5">
-                          <CheckCircle className="w-3 h-3 text-success shrink-0" />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
+          <>
+            {/* Billing toggle */}
+            <div className="flex justify-center">
+              <div className="inline-flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleCycleChange(tab.key)}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                      cycle === tab.key
+                        ? "bg-[#4f46e5] text-white shadow"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <Button
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold rounded-xl"
-              disabled={submitting}
-              onClick={handleContinue}
+            {/* Plan cards */}
+            <div
+              className={`grid gap-6 ${
+                visiblePlans.length === 2
+                  ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto w-full"
+                  : "grid-cols-1 md:grid-cols-3"
+              }`}
             >
-              {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Continue with {currentPlan?.label}
-            </Button>
-          </div>
+              {visiblePlans.map((plan) => {
+                const price = formatPrice(plan, cycle);
+                const isSelected = selectedPlan === plan.id;
+                const isPopular = plan.popular;
+
+                return (
+                  <div key={plan.id} className="relative flex flex-col pt-5">
+                    {isPopular && (
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+                        <span className="bg-[#4f46e5] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap">
+                          Most Popular
+                        </span>
+                      </div>
+                    )}
+                    <Card
+                      className={`flex-1 cursor-pointer transition-all rounded-2xl ${
+                        isPopular
+                          ? "border-2 border-[#4f46e5] shadow-lg"
+                          : isSelected
+                          ? "border-2 border-[#4f46e5]/50 shadow-md"
+                          : "border border-gray-200 hover:border-[#4f46e5]/40 shadow-sm"
+                      } bg-white`}
+                      onClick={() => setSelectedPlan(plan.id)}
+                    >
+                      <CardContent className="pt-6 pb-6 px-6 flex flex-col gap-5">
+                        <div>
+                          <p className="text-[11px] font-bold text-[#4f46e5] uppercase tracking-widest">
+                            {plan.label}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">{plan.subtitle}</p>
+                          <p className="text-4xl font-extrabold text-gray-900 mt-3">
+                            {price}
+                            {plan.monthlyPrice !== 0 && (
+                              <span className="text-sm font-normal text-gray-400"> /month</span>
+                            )}
+                          </p>
+                        </div>
+
+                        <Button
+                          className={`w-full rounded-xl text-sm font-semibold h-11 ${
+                            isPopular
+                              ? "bg-[#4f46e5] hover:bg-[#4338ca] text-white"
+                              : "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
+                          }`}
+                          disabled={submitting && selectedPlan === plan.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectPlan(plan.id);
+                          }}
+                        >
+                          {submitting && selectedPlan === plan.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>{plan.cta}{isPopular ? " →" : ""}</>
+                          )}
+                        </Button>
+
+                        <ul className="space-y-2.5">
+                          {plan.features.map((f) => (
+                            <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
+                              <CheckCircle className="w-4 h-4 text-[#4f46e5] shrink-0 mt-0.5" />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         ) : (
-          <Card className="shadow-sm">
-            <CardContent className="pt-6">
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <PaymentForm onSuccess={handleSuccess} />
-              </Elements>
-            </CardContent>
-          </Card>
+          <div className="max-w-md mx-auto w-full">
+            <Card className="shadow-sm rounded-2xl">
+              <CardContent className="pt-6">
+                <h2 className="text-lg font-bold mb-4 text-gray-900">Complete Payment</h2>
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <PaymentForm onSuccess={() => navigate("/dashboard", { replace: true })} />
+                </Elements>
+              </CardContent>
+            </Card>
+            <button
+              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline w-full text-center"
+              onClick={() => setClientSecret(null)}
+            >
+              ← Back to plans
+            </button>
+          </div>
         )}
       </div>
     </div>
