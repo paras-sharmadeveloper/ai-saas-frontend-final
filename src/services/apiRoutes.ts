@@ -57,6 +57,7 @@ export const API_ROUTES = {
     updateKnowledge: "/agent/knowledge", 
     update:          "/agent/update/:id",
     assignNumber: "/agent/assign-number", 
+    syncWebhook: (id: string) => `/agent/update-webhook/${id}`,
     updatePrompt: (id: string) => `/agent/${id}/prompt`,
   },
 

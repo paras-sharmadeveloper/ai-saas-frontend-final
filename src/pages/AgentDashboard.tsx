@@ -16,6 +16,7 @@ export function AgentDashboard({ client, onAgentUpdated }: {
     const [knowledgeText, setKnowledgeText] = useState("");
     const [saving, setSaving] = useState(false);
     const [assigningNumber, setAssigningNumber] = useState(false);
+    const [syncing, setSyncing] = useState(false);
 
     const config = client.agent_config;
     const prompt = client.agent_prompt;
@@ -35,7 +36,20 @@ export function AgentDashboard({ client, onAgentUpdated }: {
             setSaving(false);
         }
     };
-
+    const handleSyncWebhook = async () => {
+        setSyncing(true);
+        try {
+            const res = await api.post(API_ROUTES.agentCreate.syncWebhook(client.elevenlabs_agent_id), {
+                agent_id: client.elevenlabs_agent_id,
+            });
+            toast.success("Agent connected successfully!");
+            onAgentUpdated({ ...client, elevenlabs_webhook_id: res.data.webhook_id });
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message ?? "Failed to sync webhook");
+        } finally {
+            setSyncing(false);
+        }
+    };
     const handleAssignNumber = async () => {
         setAssigningNumber(true);
         try {
@@ -133,6 +147,37 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                                             : <Phone className="w-3 h-3 mr-1" />
                                         }
                                         {assigningNumber ? "Assigning..." : "Assign Number"}
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    {/* Agent Connection */}
+                    <div className="flex justify-between py-2 border-b">
+                        <span className="text-sm text-muted-foreground">Agent Connection</span>
+                        <div className="flex items-center gap-2">
+                            {client.elevenlabs_webhook_id ? (
+                                <>
+                                    <span className="text-sm font-medium">Webhook Active</span>
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                        Connected ✓
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-xs text-muted-foreground">Not connected</span>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="rounded-full h-7 text-xs"
+                                        onClick={handleSyncWebhook}
+                                        disabled={syncing}
+                                    >
+                                        {syncing
+                                            ? <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                            : <Bot className="w-3 h-3 mr-1" />
+                                        }
+                                        {syncing ? "Syncing..." : "Sync Agent"}
                                     </Button>
                                 </>
                             )}
