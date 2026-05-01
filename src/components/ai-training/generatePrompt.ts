@@ -19,7 +19,7 @@ export function generateSystemPrompt(state: AITrainingState): string {
     lines.push(`Website: ${state.website}`);
   }
 
-  lines.push(`\nLanguage: Respond in ${state.language === "hinglish" ? "Hinglish (mix of Hindi and English)" : state.language}.`);
+ // lines.push(`\nLanguage: Respond in ${state.language === "hinglish" ? "Hinglish (mix of Hindi and English)" : state.language}.`);
 
   lines.push(`\nCall Goal: ${GOAL_LABELS[state.callGoal] || state.callGoal}`);
 

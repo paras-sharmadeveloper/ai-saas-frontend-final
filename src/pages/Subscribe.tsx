@@ -73,7 +73,7 @@ function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="overflow-y-auto max-h-[55vh] pr-1">
         <PaymentElement />
       </div>
-      <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white shrink-0" disabled={!stripe || processing}>
+      <Button type="submit" className="w-full bg-primary hover:bg-primary-700 text-white shrink-0" disabled={!stripe || processing}>
         {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
         Pay Now
       </Button>
@@ -151,7 +151,7 @@ export default function Subscribe() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-primary hover:bg-primary-700 text-white"
                   disabled={loadingPlan === p.id}
                   onClick={() => handleSelect(p)}
                 >

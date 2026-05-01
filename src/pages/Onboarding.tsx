@@ -66,7 +66,7 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="overflow-y-auto max-h-[300px] pr-1">
         <PaymentElement />
       </div>
-      <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={!stripe || processing}>
+      <Button type="submit" className="w-full bg-primary hover:bg-primary-700 text-white" disabled={!stripe || processing}>
         {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
         Pay Now
       </Button>
@@ -290,7 +290,7 @@ export default function Onboarding() {
                   ))}
                 </div>
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-primary hover:bg-primary-700 text-white"
                   disabled={submitting}
                   onClick={() => handlePlanSelect(selectedPlan)}
                 >
@@ -350,7 +350,7 @@ export default function Onboarding() {
                 Redirecting to dashboard in <span className="font-bold text-foreground text-lg">{countdown}</span>s...
               </p>
               <Button
-                className="w-full h-12 bg-green-600 hover:bg-green-700 text-white text-base font-semibold rounded-xl"
+                className="w-full h-12 bg-primary hover:bg-primary-700 text-white text-base font-semibold rounded-xl"
                 onClick={() => navigate("/dashboard", { replace: true })}
               >
                 Go to Dashboard Now

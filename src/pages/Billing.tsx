@@ -122,7 +122,7 @@ function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
       <div className="overflow-y-auto max-h-[55vh] pr-1">
         <PaymentElement />
       </div>
-      <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white shrink-0" disabled={!stripe || processing}>
+      <Button type="submit" className="w-full bg-primary hover:bg-primary-700 text-white shrink-0" disabled={!stripe || processing}>
         {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
         Pay Now
       </Button>
@@ -160,7 +160,7 @@ export default function Billing() {
 
   const handleUpgrade = async (plan: PlanDef) => {
     const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
-    
+
     if (price === 0) {
       toast.success(`Switched to ${plan.label} plan`);
       return;
@@ -241,11 +241,10 @@ export default function Billing() {
             <button
               key={tab.key}
               onClick={() => setCycle(tab.key)}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                cycle === tab.key
-                  ? "bg-[#4f46e5] text-white shadow"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${cycle === tab.key
+                ? "bg-[#4f46e5] text-white shadow"
+                : "text-gray-600 hover:text-gray-900"
+                }`}
             >
               {tab.label}
             </button>

@@ -112,7 +112,7 @@ export function EditAgentForm({ client, onUpdated }: Props) {
                             onChange={e => set("language", e.target.value)}
                             className="w-full h-11 rounded-xl border border-input bg-background px-3 text-sm"
                         >
-                            {["en", "hi", "hinglish"].map(l => (
+                            {["en", "hi"].map(l => (
                                 <option key={l} value={l}>{l.toUpperCase()}</option>
                             ))}
                         </select>

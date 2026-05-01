@@ -163,7 +163,7 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Button onClick={handleSave} disabled={saving} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary-700 text-white">
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Save Changes
             </Button>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                   onChange={(e) => setPw((p) => ({ ...p, new_password_confirmation: e.target.value }))}
                 />
               </div>
-              <Button type="submit" className="bg-green-600 hover:bg-green-700 text-white" disabled={changingPw}>
+              <Button type="submit" className="bg-primary hover:bg-primary-700 text-white" disabled={changingPw}>
                 {changingPw && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Update Password
               </Button>

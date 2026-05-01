@@ -130,7 +130,7 @@ export default function Customers() {
               </p>
             </div>
           ) : (
-              <Table>
+            <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
@@ -226,7 +226,7 @@ export default function Customers() {
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               />
             </div>
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={submitting}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary-700 text-white" disabled={submitting}>
               {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {editCustomer ? "Update Customer" : "Add Customer"}
             </Button>
