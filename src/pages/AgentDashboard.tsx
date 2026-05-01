@@ -27,7 +27,7 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                 agent_id: client.elevenlabs_agent_id,
                 knowledge_text: knowledgeText,
             });
-            toast.success("Knowledge base updated on ElevenLabs! ✅");
+            toast.success("Knowledge base updated on ElevenLabs! ");
             setKnowledgeText("");
         } catch {
             toast.error("Failed to update knowledge base");
@@ -41,7 +41,7 @@ export function AgentDashboard({ client, onAgentUpdated }: {
         try {
             const res = await api.post(API_ROUTES.agentCreate.assignNumber);
             if (res.data.success) {
-                toast.success(`${res.data.phone_number} assigned! ✅`);
+                toast.success(`${res.data.phone_number} assigned! `);
                 onAgentUpdated({
                     ...client,
                     phone_number: { number: res.data.phone_number, is_assigned: true }

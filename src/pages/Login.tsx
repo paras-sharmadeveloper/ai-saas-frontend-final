@@ -58,14 +58,14 @@ export default function Login() {
         return;
       }
 
-      // ✅ Redux store
+      //  Redux store
       dispatch(
         loginSuccess({
           token: result.token,
           user: result.user,
         })
       );
-      // ✅ direct redirect
+      //  direct redirect
       //navigate("/admin/dashboard");
 
     } catch (error) {
@@ -73,7 +73,7 @@ export default function Login() {
       const status = error.response?.status;
       if (status === 403) {
         toast.error("Please verify your email first.");
-        setShowResend(true); // ✅ link show karo
+        setShowResend(true); //  link show karo
         return;
       }
       toast.error(msg);

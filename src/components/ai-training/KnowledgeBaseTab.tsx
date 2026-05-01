@@ -78,7 +78,7 @@ export function KnowledgeBaseTab({ clientId }: Props) {
             if (res.data.success) {
                 setItems(prev => [res.data.knowledge, ...prev]);
                 resetForm();
-                toast.success("Knowledge added successfully! ✅");
+                toast.success("Knowledge added successfully! ");
             }
         } catch {
             toast.error("Failed to add knowledge");

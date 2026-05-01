@@ -48,7 +48,7 @@ export function EditAgentForm({ client, onUpdated }: Props) {
             );
 
             if (res.data.success) {
-                toast.success("Agent updated successfully! ✅");
+                toast.success("Agent updated successfully! ");
                 onUpdated(res.data.client);
             }
         } catch {

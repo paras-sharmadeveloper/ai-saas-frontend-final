@@ -112,7 +112,7 @@ export function ToneStep({ state, update }: Props) {
             <button
               key={t.id}
               onClick={() => update("tone", t.name.toLowerCase())}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${state.tone === t.name.toLowerCase()   // ✅ both lowercase = safe compare
+              className={`p-4 rounded-xl border-2 text-left transition-all ${state.tone === t.name.toLowerCase()   //  both lowercase = safe compare
                 ? "border-primary bg-primary/5 shadow-sm"
                 : "border-border hover:border-primary/40"
                 }`}

@@ -197,7 +197,7 @@ export default function AITraining() {
     }
   };
 
-  // ✅ Early returns SABSE NEECHE — hooks ke baad
+  //  Early returns SABSE NEECHE — hooks ke baad
   if (agentExists === null) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -215,7 +215,7 @@ export default function AITraining() {
     );
   }
 
-  // ✅ Wizard — sirf tab jab agentExists === false
+  //  Wizard — sirf tab jab agentExists === false
   return (
     <div className="flex flex-col items-center min-h-[calc(100vh-4rem)] relative">
       <StepIndicator steps={STEPS} currentIndex={stepIndex} onStepClick={(key) => setStep(key)} />
