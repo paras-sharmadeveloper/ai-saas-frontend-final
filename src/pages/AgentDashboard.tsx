@@ -156,6 +156,19 @@ export function AgentDashboard({ client, onAgentUpdated }: {
                     <div className="flex justify-between py-2 border-b">
                         <span className="text-sm text-muted-foreground">Agent Connection</span>
                         <div className="flex items-center gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="rounded-full h-7 text-xs"
+                                onClick={handleSyncWebhook}
+                                disabled={syncing}
+                            >
+                                {syncing
+                                    ? <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                                    : <Bot className="w-3 h-3 mr-1" />
+                                }
+                                {syncing ? "Syncing..." : "Sync Agent"}
+                            </Button>
                             {client.elevenlabs_webhook_id ? (
                                 <>
                                     <span className="text-sm font-medium">Webhook Active</span>
