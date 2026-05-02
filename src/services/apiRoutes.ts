@@ -105,6 +105,12 @@ export const API_ROUTES = {
     validate: "/subscription/validate",
   },
 
+  // Plans
+  plans: {
+    base: "/plans",
+    byKey: (key: string) => `/plans/${key}`,
+  },
+
   // Stripe / Billing
   stripe: {
     plans: "/stripe/plans",

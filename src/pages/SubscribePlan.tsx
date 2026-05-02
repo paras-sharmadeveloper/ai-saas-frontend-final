@@ -8,7 +8,8 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { billingService } from "@/services/billingService";
+import { billingService, type Plan } from "@/services/billingService";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "");
 
@@ -28,85 +29,10 @@ function LyraaMark({ className = "w-10 h-10" }: { className?: string }) {
   );
 }
 
-type BillingCycle = "monthly" | "annual" | "test";
+type BillingCycle = "monthly" | "annual";
 
-interface PlanDef {
-  id: string;
-  label: string;
-  subtitle: string;
-  monthlyPrice: number;
-  annualPrice: number;
-  currency: "$" | "₹";
-  features: string[];
-  popular?: boolean;
-  cta: string;
-  tabs: BillingCycle[];
-}
-
-const PLANS: PlanDef[] = [
-  // --- Monthly / Annual plans ---
-  {
-    id: "starter",
-    label: "Starter",
-    subtitle: "For solo operators and new businesses.",
-    monthlyPrice: 49,
-    annualPrice: 41.65,
-    currency: "$",
-    features: ["200 minutes/month", "Australian voice", "Calendar sync", "SMS follow-ups", "Email support"],
-    cta: "Start free trial",
-    tabs: ["monthly", "annual"],
-  },
-  {
-    id: "growth",
-    label: "Growth",
-    subtitle: "For growing service businesses.",
-    monthlyPrice: 129,
-    annualPrice: 109.65,
-    currency: "$",
-    features: ["800 minutes/month", "All Starter features", "CRM integrations", "Invoicing + quoting", "Smart call routing", "Priority support"],
-    popular: true,
-    cta: "Start free trial",
-    tabs: ["monthly", "annual"],
-  },
-  {
-    id: "scale",
-    label: "Scale",
-    subtitle: "For established operators and teams.",
-    monthlyPrice: 349,
-    annualPrice: 296.65,
-    currency: "$",
-    features: ["Unlimited minutes", "All Growth features", "Multi-location", "Custom voice training", "API access", "Dedicated manager"],
-    cta: "Book a demo",
-    tabs: ["monthly", "annual"],
-  },
-  // --- Test plans ---
-  // {
-  //   id: "free",
-  //   label: "Free",
-  //   subtitle: "Try it out, zero cost.",
-  //   monthlyPrice: 0,
-  //   annualPrice: 0,
-  //   currency: "₹",
-  //   features: ["1 AI Agent", "50 calls/month", "Basic voice", "Email support"],
-  //   cta: "Get started free",
-  //   tabs: ["test"],
-  // },
-  {
-    id: "test_rupee",
-    label: "Test Plan",
-    subtitle: "Two-dollar payment for testing.",
-    monthlyPrice: 2,
-    annualPrice: 2,
-    currency: "$",
-    features: ["Same as Starter", "Test payment only", "$2 charge"],
-    cta: "Pay $2 now",
-    tabs: ["test"],
-  },
-];
-
-function formatPrice(plan: PlanDef, cycle: BillingCycle) {
-  const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
-  return `${plan.currency}${price}`;
+function formatPrice(plan: Plan) {
+  return `$${plan.price}`;
 }
 
 function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
@@ -157,30 +83,53 @@ function PaymentForm({ onSuccess }: { onSuccess: () => void }) {
 
 export default function SubscribePlan() {
   const navigate = useNavigate();
+  const { refreshSubscription } = useSubscription();
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
-  const [selectedPlan, setSelectedPlan] = useState<string>("growth");
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    api
-      .get(API_ROUTES.subscription.validate)
-      .then((res) => {
-        if (res.data?.data !== null && res.data?.data !== undefined) {
+    Promise.all([
+      api.get(API_ROUTES.subscription.validate),
+      billingService.getAllPlans(),
+    ])
+      .then(([validationRes, plansList]) => {
+        if (validationRes.data?.data !== null && validationRes.data?.data !== undefined) {
           navigate("/dashboard", { replace: true });
         } else {
+          if (Array.isArray(plansList)) {
+            const activePlans = plansList.filter(p => p.is_active !== false);
+            setPlans(activePlans);
+            // Set default selected plan to first monthly plan or first plan
+            const defaultPlan = activePlans.find(p => p.billing === "monthly") || activePlans[0];
+            if (defaultPlan) setSelectedPlan(defaultPlan.plan_key);
+          }
           setChecking(false);
         }
       })
-      .catch(() => setChecking(false));
+      .catch(() => {
+        setChecking(false);
+        billingService.getAllPlans()
+          .then((plansList) => {
+            if (Array.isArray(plansList)) {
+              const activePlans = plansList.filter(p => p.is_active !== false);
+              setPlans(activePlans);
+              const defaultPlan = activePlans.find(p => p.billing === "monthly") || activePlans[0];
+              if (defaultPlan) setSelectedPlan(defaultPlan.plan_key);
+            }
+          })
+          .catch(() => null);
+      });
   }, []);
 
   // When switching tabs, reset selected plan to the first visible one
   const handleCycleChange = (newCycle: BillingCycle) => {
     setCycle(newCycle);
-    const first = PLANS.find((p) => p.tabs.includes(newCycle));
-    if (first) setSelectedPlan(first.id);
+    const first = plans.find((p) => p.billing === newCycle);
+    if (first) setSelectedPlan(first.plan_key);
   };
 
   if (checking) {
@@ -191,19 +140,19 @@ export default function SubscribePlan() {
     );
   }
 
-  const visiblePlans = PLANS.filter((p) => p.tabs.includes(cycle));
+  const visiblePlans = plans.filter((p) => p.billing === cycle);
 
-  const handleSelectPlan = async (planId: string) => {
-    setSelectedPlan(planId);
-    const plan = PLANS.find((p) => p.id === planId);
+  const handleSelectPlan = async (planKey: string) => {
+    setSelectedPlan(planKey);
+    const plan = plans.find((p) => p.plan_key === planKey);
     if (!plan) return;
 
-    const price = cycle === "annual" ? plan.annualPrice : plan.monthlyPrice;
+    const price = parseFloat(plan.price);
 
     if (price === 0) {
       setSubmitting(true);
       try {
-        await api.post(API_ROUTES.subscription.validate, { plan: planId });
+        await api.post(API_ROUTES.subscription.validate, { plan: planKey });
         toast.success("Free plan activated!");
         navigate("/dashboard", { replace: true });
       } catch {
@@ -216,7 +165,7 @@ export default function SubscribePlan() {
 
     setSubmitting(true);
     try {
-      const { client_secret } = await billingService.createPaymentIntent({ plan: planId, billing_cycle: cycle });
+      const { client_secret } = await billingService.createPaymentIntent({ plan: planKey, billing_cycle: plan.billing });
       setClientSecret(client_secret);
     } catch (err: unknown) {
       const msg =
@@ -231,7 +180,6 @@ export default function SubscribePlan() {
   const tabs: { key: BillingCycle; label: string }[] = [
     { key: "monthly", label: "Monthly" },
     { key: "annual", label: "Annual" },
-    { key: "test", label: "Test" },
   ];
 
   return (
@@ -278,12 +226,12 @@ export default function SubscribePlan() {
               }`}
             >
               {visiblePlans.map((plan) => {
-                const price = formatPrice(plan, cycle);
-                const isSelected = selectedPlan === plan.id;
-                const isPopular = plan.popular;
+                const price = formatPrice(plan);
+                const isSelected = selectedPlan === plan.plan_key;
+                const isPopular = plan.most_popular;
 
                 return (
-                  <div key={plan.id} className="relative flex flex-col pt-5">
+                  <div key={plan.plan_key} className="relative flex flex-col pt-5">
                     {isPopular && (
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
                         <span className="bg-[#4f46e5] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap">
@@ -299,19 +247,17 @@ export default function SubscribePlan() {
                           ? "border-2 border-[#4f46e5]/50 shadow-md"
                           : "border border-gray-200 hover:border-[#4f46e5]/40 shadow-sm"
                       } bg-white`}
-                      onClick={() => setSelectedPlan(plan.id)}
+                      onClick={() => setSelectedPlan(plan.plan_key)}
                     >
                       <CardContent className="pt-6 pb-6 px-6 flex flex-col gap-5">
                         <div>
                           <p className="text-[11px] font-bold text-[#4f46e5] uppercase tracking-widest">
-                            {plan.label}
+                            {plan.name}
                           </p>
-                          <p className="text-xs text-gray-500 mt-0.5">{plan.subtitle}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{plan.description || `For ${plan.name.toLowerCase()} users`}</p>
                           <p className="text-4xl font-extrabold text-gray-900 mt-3">
                             {price}
-                            {plan.monthlyPrice !== 0 && (
-                              <span className="text-sm font-normal text-gray-400"> /month</span>
-                            )}
+                            <span className="text-sm font-normal text-gray-400"> /month</span>
                           </p>
                         </div>
 
@@ -321,21 +267,21 @@ export default function SubscribePlan() {
                               ? "bg-[#4f46e5] hover:bg-[#4338ca] text-white"
                               : "bg-white border border-gray-300 text-gray-800 hover:bg-gray-50"
                           }`}
-                          disabled={submitting && selectedPlan === plan.id}
+                          disabled={submitting && selectedPlan === plan.plan_key}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSelectPlan(plan.id);
+                            handleSelectPlan(plan.plan_key);
                           }}
                         >
-                          {submitting && selectedPlan === plan.id ? (
+                          {submitting && selectedPlan === plan.plan_key ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            <>{plan.cta}{isPopular ? " →" : ""}</>
+                            <>Subscribe{isPopular ? " →" : ""}</>
                           )}
                         </Button>
 
                         <ul className="space-y-2.5">
-                          {plan.features.map((f) => (
+                          {plan.features && plan.features.map((f) => (
                             <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
                               <CheckCircle className="w-4 h-4 text-[#4f46e5] shrink-0 mt-0.5" />
                               {f}
@@ -355,7 +301,10 @@ export default function SubscribePlan() {
               <CardContent className="pt-6">
                 <h2 className="text-lg font-bold mb-4 text-gray-900">Complete Payment</h2>
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                  <PaymentForm onSuccess={() => navigate("/dashboard", { replace: true })} />
+                  <PaymentForm onSuccess={async () => {
+                    await refreshSubscription();
+                    navigate("/dashboard", { replace: true });
+                  }} />
                 </Elements>
               </CardContent>
             </Card>

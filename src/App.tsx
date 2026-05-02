@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 
 import AppRoutes from "./routes/AppRoutes";
 
@@ -15,13 +16,15 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <Provider store={store}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <SubscriptionProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </SubscriptionProvider>
     </Provider>
   </QueryClientProvider>
 );

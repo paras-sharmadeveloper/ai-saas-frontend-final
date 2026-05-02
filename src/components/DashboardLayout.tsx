@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import AppSidebar from "./AppSidebar";
-import { Bell, Search, PanelLeft, ChevronDown, Sparkles, ArrowUpCircle } from "lucide-react";
+import { PanelLeft, ChevronDown, Clock } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/authSlice";
+import { useSubscription } from "@/context/SubscriptionContext";
+import { API_ROUTES } from "@/services/apiRoutes";
 
 import {
   DropdownMenu,
@@ -13,22 +14,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Toaster as Sonner, toast } from "@/components/ui/sonner";
+import { toast } from "@/components/ui/sonner";
 import { useAppSelector } from "@/redux/hooks";
+import { api } from "@/services/api";
+
+import { dashboardService, type DashboardData } from "@/services/dashboardService";
 
 
 export default function DashboardLayout() {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DashboardData | null>(null);
   const dispatch = useDispatch();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { subscriptionValidation } = useSubscription();
   const navigate = useNavigate();
+
   const handleLogout = () => {
     dispatch(logout());
 
     toast.success("Logged out successfully");
     navigate("/login");
   };
-  const user = useAppSelector((state) => state.auth.user);
+
+    useEffect(() => {
+      dashboardService
+        .getData()
+        .then(async (d) => {
+          setData(d);
+          try {
+            const res = await api.get(API_ROUTES.subscription.validate);
+            if (res.data?.data === null || res.data?.data === undefined) {
+              navigate("/subscribe-plan", { replace: true });
+            }
+          } catch {
+            navigate("/subscribe-plan", { replace: true });
+          }
+        })
+        .catch(() => toast.error("Failed to load dashboard"))
+        .finally(() => setLoading(false));
+    }, []);
+  
+  const user = useAppSelector((state: any) => state.auth.user) as { name?: string } | null;
 
   const hour = new Date().getHours();
   const greeting =
@@ -51,14 +77,66 @@ export default function DashboardLayout() {
               {greeting}, {user?.name || "User"} 👋
             </span>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
+            {/* Subscription Information Banner */}
+            {subscriptionValidation?.valid && (
+              <>
+                {/* Trial Plan */}
+                {subscriptionValidation.access_type === "trial" && subscriptionValidation.data.trial_days_left !== undefined && (
+                  <button
+                    onClick={() => navigate("/subscribe-plan")}
+                    className="flex items-center gap-3 px-6 py-2 bg-orange-100 rounded-xl border border-orange-300 w-[420px] hover:bg-orange-200 transition-colors cursor-pointer"
+                  >
+                    <Clock className="w-6 h-6 text-orange-600" />
+                    <span className="text-base font-semibold text-orange-700">
+                      {subscriptionValidation.data.trial_days_left} days left
+                    </span>
+                    <span className="text-sm text-orange-600 hidden lg:inline">
+                      · Expires{" "}
+                      {subscriptionValidation.data.trial_ends_at && new Date(
+                        subscriptionValidation.data.trial_ends_at
+                      ).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </button>
+                )}
+
+                {/* Paid Subscription */}
+                {subscriptionValidation.access_type === "subscription" && subscriptionValidation.data.plan_name && (
+                  <button
+                    onClick={() => navigate("/subscribe-plan")}
+                    className="flex items-center gap-3 px-6 py-2 bg-orange-100 rounded-xl border border-orange-300 w-[420px] hover:bg-orange-200 transition-colors cursor-pointer"
+                  >
+                    <Clock className="w-6 h-6 text-orange-600" />
+                    <span className="text-base font-semibold text-orange-700">
+                      {subscriptionValidation.data.plan_name} Plan
+                    </span>
+                    <span className="text-sm text-orange-600 hidden lg:inline">
+                      · {subscriptionValidation.data.days_remaining} days left · Renews{" "}
+                      {subscriptionValidation.data.ends_at && new Date(
+                        subscriptionValidation.data.ends_at
+                      ).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </button>
+                )}
+              </>
+            )}
+
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
                 <Avatar className="w-8 h-8 bg-warning text-warning-foreground">
                   <AvatarFallback className="bg-warning text-warning-foreground text-sm font-semibold">{user?.name
                     ? user.name
                       .split(" ")
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join("")
                     : "U"}</AvatarFallback>
                 </Avatar>

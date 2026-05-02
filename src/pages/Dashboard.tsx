@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Phone, Users, PhoneMissed, Clock, Loader2, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardService, type DashboardData } from "@/services/dashboardService";
+import { billingService, type SubscriptionValidation } from "@/services/billingService";
 import { api } from "@/services/api";
 import { API_ROUTES } from "@/services/apiRoutes";
 
@@ -25,6 +26,7 @@ const HEARD_FROM = ["Google Search", "Social Media", "Friend / Referral", "Blog 
 
 export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [subscriptionValidation, setSubscriptionValidation] = useState<SubscriptionValidation | null>(null);
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [submitting, setSubmitting] = useState(false);
