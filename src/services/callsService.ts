@@ -15,7 +15,7 @@ export interface CallMessage {
 
 export interface Call {
   id?: string | number;
-  uuid:string;
+  uuid: string;
   conversation_id?: string;
   user_id?: number;
   agent_id?: number;
@@ -45,10 +45,37 @@ export interface Call {
   messages?: CallMessage[];
 }
 
+export interface PaginatedCallsResponse {
+  data: Call[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  debug_user_id?: number;
+  debug_total_logs?: number;
+  debug_user_logs?: number;
+}
+
+export interface CallsQueryParams {
+  page?: number;
+  per_page?: number;
+  search?: string;
+  filter?: string;
+}
+
 const { base, byId, messages } = API_ROUTES.calls;
 
 export const callsService = {
-  getAll: () => api.get<Call[]>(base).then((r) => r.data),
+  getAll: (params?: CallsQueryParams) => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.per_page) searchParams.append('per_page', params.per_page.toString());
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.filter && params.filter !== 'All') searchParams.append('filter', params.filter);
+    
+    const url = searchParams.toString() ? `${base}?${searchParams.toString()}` : base;
+    return api.get<PaginatedCallsResponse>(url).then((r) => r.data);
+  },
   getById: (id: string) => api.get<Call>(byId(id)).then((r) => r.data),
   create: (data: Partial<Call>) => api.post<Call>(base, data).then((r) => r.data),
   update: (id: string, data: Partial<Call>) => api.put<Call>(byId(id), data).then((r) => r.data),

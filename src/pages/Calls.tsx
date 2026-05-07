@@ -5,9 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2, PhoneCall } from "lucide-react";
+import { Search, Loader2, PhoneCall, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { callsService, type Call } from "@/services/callsService";
+import { callsService, type Call, type PaginatedCallsResponse } from "@/services/callsService";
 
 const filters = ["All", "lead", "complaint", "service"];
 
@@ -37,22 +37,58 @@ export default function Calls() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    per_page: 10,
+    total: 0,
+    last_page: 1
+  });
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadCalls = (page = 1, searchTerm = search, filterType = filter) => {
+    setLoading(true);
     callsService
-      .getAll()
-      .then(setCalls)
-      .catch(() => toast.error("Failed to load calls"))
+      .getAll({
+        page,
+        per_page: 10,
+        search: searchTerm || undefined,
+        filter: filterType !== "All" ? filterType : undefined
+      })
+      .then((response: PaginatedCallsResponse) => {
+        setCalls(response.data || []);
+        setPagination({
+          current_page: response.current_page,
+          per_page: response.per_page,
+          total: response.total,
+          last_page: response.last_page
+        });
+      })
+      .catch(() => {
+        toast.error("Failed to load calls");
+        setCalls([]);
+      })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadCalls();
   }, []);
 
-  const filtered = calls.filter((c) => {
-    const name = getCustomerName(c).toLowerCase();
-    if (filter !== "All" && getType(c)?.toLowerCase() !== filter) return false;
-    if (search && !name.includes(search.toLowerCase()) && !(c.phone ?? "").includes(search)) return false;
-    return true;
-  });
+  const handleFilterChange = (newFilter: string) => {
+    setFilter(newFilter);
+    loadCalls(1, search, newFilter);
+  };
+
+  const handleSearchChange = (searchTerm: string) => {
+    setSearch(searchTerm);
+    loadCalls(1, searchTerm, filter);
+  };
+
+  const handlePageChange = (page: number) => {
+    loadCalls(page, search, filter);
+  };
+
+  const filtered = calls; // Server-side filtering now
 
   if (loading) {
     return (
@@ -67,11 +103,16 @@ export default function Calls() {
       <h1 className="text-2xl font-bold">Calls</h1>
       <div className="flex flex-wrap items-center gap-2">
         {filters.map((f) => (
-          <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => setFilter(f)} className="rounded-lg">{f}</Button>
+          <Button key={f} variant={filter === f ? "default" : "outline"} size="sm" onClick={() => handleFilterChange(f)} className="rounded-lg">{f}</Button>
         ))}
         <div className="relative ml-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search customer..." className="pl-9 w-56 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input 
+            placeholder="Search customer..." 
+            className="pl-9 w-56 h-9" 
+            value={search} 
+            onChange={(e) => handleSearchChange(e.target.value)} 
+          />
         </div>
       </div>
 
@@ -117,6 +158,40 @@ export default function Calls() {
           )}
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {pagination.total > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Showing {((pagination.current_page - 1) * pagination.per_page) + 1} to{' '}
+            {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of{' '}
+            {pagination.total} results
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(pagination.current_page - 1)}
+              disabled={pagination.current_page <= 1 || loading}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {pagination.current_page} of {pagination.last_page}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(pagination.current_page + 1)}
+              disabled={pagination.current_page >= pagination.last_page || loading}
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
